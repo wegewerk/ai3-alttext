@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<guides
+    xmlns="https://www.phpdoc.org/guides"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://www.phpdoc.org/guides
+        vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd"
+    theme="typo3docs"
+    default-code-language="php"
+    links-are-relative="true"
+>
+    <project
+        title="Ai3 Alt Text"
+        version="0.9"
+        release="0.9.0"
+        copyright="since 2026 by Wegewerk GmbH"
+    />
+
+    <extension
+        class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
+        typo3-core-preferred="stable"
+        interlink-shortcode="wegewerk/ai3_alttext"
+        project-home="https://github.com/wegewerk/ai3"
+        project-contact="https://github.com/wegewerk/ai3/issues"
+        project-repository="https://github.com/wegewerk/ai3"
+        project-issues="https://github.com/wegewerk/ai3/issues"
+        edit-on-github="wegewerk/ai3"
+        edit-on-github-branch="main"
+        edit-on-github-directory="packages/ai3_alttext/Documentation"
+    />
+
+    <inventory
+        id="t3coreapi"
+        url="https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/"
+    />
+    <inventory
+        id="t3tca"
+        url="https://docs.typo3.org/m/typo3/reference-tca/main/en-us/"
+    />
+</guides>

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file source-language="en" target-language="de" original="EXT:ai3/Resources/Private/Language/locallang.xlf" datatype="plaintext" product-name="ai3" date="2026-06-23T16:06:56+02:00">
+		<header></header>
+		<body>
+			<trans-unit id="generation.alttext">
+				<source>Generate alternative text</source>
+				<target>Alternativtext generieren</target>
+			</trans-unit>
+			<trans-unit id="generation.alttextAdToBatch">
+				<source>Add alttext generation to batch</source>
+				<target>Alternativtext-Generierung zum Batch hinzufügen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.acceptAllRecursive.content">
+				<source>Accepted Alt-Text suggestions in %s Files.</source>
+				<target>Alt-Text Vorschläge für %s Dateien übernommen.</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.acceptAllRecursive.title">
+				<source>Accept Recursive result</source>
+				<target>Ergebnis</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.action.acceptall">
+				<source>approve all</source>
+				<target>Alle Vorschläge annehmen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.action.approve">
+				<source>approve</source>
+				<target>annehmen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.action.edit">
+				<source>edit metadata</source>
+				<target>Metadaten bearbeiten</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.action.editSuggestion">
+				<source>edit suggestion</source>
+				<target>Vorschlag bearbeiten</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.action.generate">
+				<source>generate alt text with AI</source>
+				<target>Alt Text mit KI erzeugen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.action.generateall">
+				<source>generate alt texts (%s cred.)</source>
+				<target>Alt-Texte generieren (%s cred.)</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.addmanually">
+				<source>add alt-text manually</source>
+				<target>Alt Text manuell hinzufügen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.aigenerated">
+				<source>AI generated</source>
+				<target>KI generiert</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.allimageshavealt">
+				<source>All images have alt-text</source>
+				<target>alle Bilder haben Alt-Text</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.allusedimageshavealt">
+				<source>All images used have alt-text</source>
+				<target>alle verwendeten Bilder haben Alt-Text</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.approved">
+				<source>approved</source>
+				<target>geprüft</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.badge.aisuggestion">
+				<source>AI Suggestion</source>
+				<target>KI Vorschlag</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.closePreview">
+				<source>close</source>
+				<target>Schliessen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.column.actions">
+				<source>actions</source>
+				<target>Aktionen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.column.alt">
+				<source>alternative Text</source>
+				<target>Alt Text</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.column.preview">
+				<source>preview</source>
+				<target>Vorschau</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.column.title">
+				<source>Title / File</source>
+				<target>Titel / Datei</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.column.usage">
+				<source>usages</source>
+				<target>verwendet</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.emptyfolder">
+				<source>No Files found in current folder</source>
+				<target>Keine Dateien im aktuellen Ordner gefunden</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.folder">
+				<source>Folder</source>
+				<target>Ordner</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.generateAllTexts">
+				<source>Generate Alt-Texts with AI</source>
+				<target>Alle Alt-Texte mit KI erzeugen.</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.header">
+				<source>Asset metadata generation</source>
+				<target>Datei-Metadaten erzeugen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.imagesusedwithoutalt">
+				<source>Used without alt-text</source>
+				<target>verwendet ohne Alt-Text</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.imageswithoutalt">
+				<source>Images without alt-text</source>
+				<target>Bilder ohne Alt-Text</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.loading">
+				<source>Loading File list</source>
+				<target>Dateiliste wird geladen...</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.regenerateAITexts">
+				<source>Generate missing alt texts</source>
+				<target>nur fehlende Alt-Texte erzeugen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.select">
+				<source>select</source>
+				<target>auswählen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.selectallusedwithoutalt">
+				<source>select all used Images without alt text</source>
+				<target>Alle verwendeten Bilder ohne Alt-Text auswählen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.selectallwithoutalt">
+				<source>select all Images without alt text</source>
+				<target>Alle Bilder ohne Alt-Text auswählen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.selection">
+				<source>Selection</source>
+				<target>Auswahl</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.status.queued">
+				<source>queued</source>
+				<target>in warteschlange</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.acceptAllGenerationsRecursive">
+				<source>Accept %cntGens Suggestions in %cntFolder Subfolders</source>
+				<target>%cntGens Vorschläge in %cntFolder Unterordnern annehmen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.header">
+				<source>Folder Actions</source>
+				<target>Aktionen auf Unterordner</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.loading">
+				<source>Loading Folder Info</source>
+				<target>Lade Ordner und Unterordner</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.noGenerations">
+				<source>No Suggestions found in subolders</source>
+				<target>Keine Vorschläge vorhanden in Unterordnern</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.nosubfolders">
+				<source>No Sub Folders</source>
+				<target>Keine Unterordner</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.subfolders">
+				<source>Sub Folders</source>
+				<target>Unterordner</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.modal.alttextError">
+				<source>Unable to generate alttext suggestion.&#x9;&#x9;</source>
+				<target>Es kann kein Alternativtext generiert werden.</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.modal.alttextGeneration">
+				<source>Alternative text</source>
+				<target>Alternativer Text</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3_alttext.module.actionmenu.files">
+				<source>File Metadata</source>
+				<target>Datei Metadaten</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3_alttext.module.actionmenu.folders">
+				<source>Folders</source>
+				<target>Unterordner</target>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

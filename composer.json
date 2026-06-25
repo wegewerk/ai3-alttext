@@ -1,0 +1,26 @@
+{
+    "name": "wegewerk/ai3_alttext",
+    "type": "typo3-cms-extension",
+    "description": "Ai3Alttext Alt Text - generate Image descriptions",
+    "homepage": "https://www.wegewerk.com/",
+    "license": [
+        "GPL-2.0-or-later"
+    ],
+    "keywords": [
+        "TYPO3 CMS"
+    ],
+    "require": {
+        "typo3/cms-core": "^12.4.0 | ^13.4.0 | ^14.0",
+        "wegewerk/ai3_core": "@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "Wegewerk\\Ai3Alttext\\": "Classes/"
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "ai3_alttext"
+        }
+    }
+}

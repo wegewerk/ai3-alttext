@@ -1,0 +1,8 @@
+.ai3-files-table {
+    table-layout: fixed;
+}
+
+.ai3-files-table th,
+.ai3-files-table td{
+    word-break: break-all;
+}
