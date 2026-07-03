@@ -6,7 +6,7 @@
 Configuration
 =============
 
-|extension_name| has no extension-specific settings in the TYPO3
+ai3-alttext has no extension-specific settings in the TYPO3
 Extension Manager. All configuration is done via environment variables
 that are read by :composer:`wegewerk/ai3_core`.
 

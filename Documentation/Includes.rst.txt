@@ -1,9 +1,0 @@
-.. This file contains global substitutions for all documentation pages.
-.. Include at the top of every RST file with:
-..   .. include:: /Includes.rst.txt
-
-.. |extension_key| replace:: ai3_alttext
-.. |extension_name| replace:: Ai3 Alt Text
-.. |vendor| replace:: Wegewerk GmbH
-.. |composer_name| replace:: wegewerk/ai3_alttext
-.. |min_typo3| replace:: 12.4

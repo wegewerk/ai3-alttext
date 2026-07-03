@@ -46,7 +46,6 @@ class ZakAiAlttext implements ZakAiEndpointInterface
 
         $imageData = base64_encode(file_get_contents($resizedPath));
 
-        try {
             $response = $this->client->postJson(
                 'alttexts',
                 [
@@ -68,13 +67,6 @@ class ZakAiAlttext implements ZakAiEndpointInterface
 
             return '';
 
-        } catch (\JsonException $e) {
-            $this->logger->error('JSON Dekodierungsfehler: ' . $e->getMessage());
-            throw $e;
-        } catch (ClientExceptionInterface $e) {
-            $this->logger->error('Client Exception: ' . $e->getMessage());
-            throw $e;
-        }
     }
 
     private function getResizedImagePath(string $imagePath, int $maxDimension = 512): string

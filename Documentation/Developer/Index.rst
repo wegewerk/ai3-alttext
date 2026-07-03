@@ -11,7 +11,7 @@ Developer corner
 Architecture overview
 =====================
 
-|extension_name| follows the capability pattern introduced by
+ai3-alttext follows the capability pattern introduced by
 :composer:`wegewerk/ai3_core`. The central pieces are:
 
 .. list-table::

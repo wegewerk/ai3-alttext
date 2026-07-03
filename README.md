@@ -52,7 +52,7 @@ composer require wegewerk/ai3_alttext
 
 ## Configuration
 
-This Extension provides not configuration settings. Configure the ZAK-AI credentials via environment variables.
+This Extension does not provide any configuration settings. Configure the ZAK-AI credentials via environment variables.
 See ai3_core
 
 ## Changelog

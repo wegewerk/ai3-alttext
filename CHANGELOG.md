@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
+## changed
+- Dropped TYPO3 v12 Requirement. V12 compatibility will be added when actually needed
 
 
 ## [0.9.1] - 2026-06-25

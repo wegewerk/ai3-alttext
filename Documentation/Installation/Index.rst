@@ -11,7 +11,7 @@ Installation
 Installation via Composer
 =========================
 
-The recommended way to install |extension_name| is via Composer:
+The recommended way to install ai3-alttext is via Composer:
 
 .. code-block:: bash
     :caption: Install the extension
