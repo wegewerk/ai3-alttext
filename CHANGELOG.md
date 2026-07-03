@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ## [0.9.3] - 2026-07-03
 
 
+## [0.9.3] - 2026-07-03
+
+
 ## [0.9.2] - 2026-07-03
 ## changed
 - Dropped TYPO3 v12 Requirement. V12 compatibility will be added when actually needed
