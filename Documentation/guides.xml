@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="0.9" encoding="UTF-8"?>
 <guides
     xmlns="https://www.phpdoc.org/guides"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -11,7 +11,7 @@
     <project
         title="Ai3 Alt Text"
         version="0.9"
-        release="0.9.1"
+        release="0.9.9"
         copyright="since 2026 by Wegewerk GmbH"
     />
 
