@@ -24,7 +24,7 @@ class Ai3FileController extends Ai3FileModuleController
 
         $this->pageRenderer->loadJavaScriptModule('@wegewerk/ai3alttext/fileElement.js');
         $this->pageRenderer->loadJavaScriptModule('@wegewerk/ai3alttext/fileList.js');
-        $this->pageRenderer->loadJavaScriptModule('@wegewerk/ai3core/credits.js');
+        $this->pageRenderer->loadJavaScriptModule('@wegewerk/ai3core/creditsElement.js');
         $this->pageRenderer->addCssFile('EXT:ai3_alttext/Resources/Public/Css/files.css');
 
         return $this->view->renderResponse('Ai3File/Files');

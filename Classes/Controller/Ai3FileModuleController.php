@@ -20,6 +20,7 @@ class Ai3FileModuleController extends AbstractBackendController
 {
     public function initialize(ServerRequestInterface $request): void
     {
+        parent::initialize($request);
         $this->request = $request;
         $this->view = $this->moduleTemplateFactory->create($request);
         $this->buildButtonBar();
