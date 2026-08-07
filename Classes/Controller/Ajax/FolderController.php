@@ -21,6 +21,7 @@ use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Wegewerk\Ai3Alttext\Domain\Capabilities\AlttextCapability;
 use Wegewerk\Ai3Alttext\Domain\Repository\FilemetadataRepository;
+use Wegewerk\Ai3Alttext\Service\AlttextTaskService;
 use Wegewerk\Ai3Core\Controller\Ajax\AbstractAjaxController;
 use Wegewerk\Ai3Core\Service\GenerationTaskService;
 
@@ -33,6 +34,7 @@ class FolderController extends AbstractAjaxController
         private FilemetadataRepository $filemetadataRepository,
         private AlttextCapability $alttextCapability,
         private GenerationTaskService $generationTaskService,
+        private AlttextTaskService $alttextTaskService,
         protected StorageRepository $storageRepository
     ) {
         parent::__construct(
@@ -93,6 +95,64 @@ class FolderController extends AbstractAjaxController
 
     }
 
+    public function addAlttextTasksRecursive(ServerRequestInterface $request): ResponseInterface
+    {
+        $body = $request->getParsedBody();
+        $langUid = (int)($body['langUid'] ?? 0);
+        $langIsoCode = $body['language'] ?? 'de';
+        $filter = $body['filter'] ?? 'all';
+        $requestedFolderIdentifier = $body['folder'] ?: null;
+
+        if ($requestedFolderIdentifier === null) {
+            return $this->createJsonErrorResponse(
+                new Response(),
+                [ 'message' => 'Unbekannter Ordner (null)' ]
+            );
+        }
+        try {
+            $folder = $this->getFolderFromIdentifier($requestedFolderIdentifier);
+            $files = $this->getFilesIn($folder, $langUid, true);
+            $responseData = ['tasksCreated' => 0, 'skipped' => 0];
+            foreach ($files as $file) {
+                if ($this->shouldCreateTask($file, $filter)) {
+                    $this->alttextTaskService->createTaskForFile((int)$file['uid'], $langUid, $langIsoCode);
+                    $responseData['tasksCreated']++;
+                } else {
+                    $responseData['skipped']++;
+                }
+            }
+            return $this->createJsonSuccessResponse(
+                new Response(),
+                $responseData
+            );
+        } catch (\RuntimeException $e) {
+            return $this->createJsonErrorResponse(
+                new Response(),
+                [ 'message' => $e->getMessage() ]
+            );
+        } catch (ResourceDoesNotExistException $e) {
+            return $this->createJsonErrorResponse(
+                new Response(),
+                [ 'message' => $e->getMessage() ]
+            );
+
+        }
+    }
+
+    private function shouldCreateTask(array $file, string $filter): bool
+    {
+        if (($file['inProgress'] ?? false) === true) {
+            return false;
+        }
+        if ($filter === 'withoutAlttext') {
+            return ($file['alternative'] ?? '') === '';
+        }
+        if ($filter === 'usedWithoutAlttext') {
+            return ($file['alternative'] ?? '') === '' && ($file['numrefs'] ?? 0) > 0;
+        }
+        return true;
+    }
+
     protected function getFolderFromIdentifier($folderIdentifier): FolderInterface
     {
         /** @var ResourceFactory $resourceFactory */
@@ -127,6 +187,7 @@ class FolderController extends AbstractAjaxController
                     }
                 }
 
+                $statistics = $this->getStatisticsRecursive($requestedFolderIdentifier);
                 return $this->createJsonSuccessResponse(
                     new Response(),
                     [
@@ -135,7 +196,8 @@ class FolderController extends AbstractAjaxController
                             'name' => $folder->getName(),
                             'storageUid' => $folder->getStorage()->getUid(),
                             'numSubfolders' => count($visibleSubfolders),
-                            'countGenerations' => $this->countGenerationsRecursive($requestedFolderIdentifier),
+                            'countGenerations' => $statistics['generations'],
+                            'countPending' => $statistics['pending'],
                         ],
                         'children' => $visibleSubfolders,
                     ]
@@ -159,7 +221,7 @@ class FolderController extends AbstractAjaxController
         }
     }
 
-    private function getFilesIn(FolderInterface $folder, $langUid = 0): array
+    private function getFilesIn(FolderInterface $folder, $langUid = 0, bool $includeRefs = false): array
     {
         $filesData = [];
         $files = $folder->getFiles(0, 0, $folder::FILTER_MODE_USE_OWN_AND_STORAGE_FILTERS, true);
@@ -181,6 +243,9 @@ class FolderController extends AbstractAjaxController
                             'uid' => $file->getUid(),
                             'hasGeneration' => $hasGeneration,
                             'metadataUid' => $metadataUid,
+                            'alternative' => (string)($meta['alternative'] ?? ''),
+                            'inProgress' => $this->generationTaskService->isTaskRunning($metadataUid),
+                            'numrefs' => $includeRefs ? $this->alttextTaskService->getRefs($file->getUid()) : 0,
                         ];
                     }
                 }
@@ -189,23 +254,32 @@ class FolderController extends AbstractAjaxController
         return $filesData;
     }
 
-    private function countGenerationsRecursive(mixed $requestedFolderIdentifier): int
+    /**
+     * Zählt wie viele AI Vorschläge bzw. Tasks im Unterordner vorliegen.
+     *
+     * @param mixed $requestedFolderIdentifier Identifier used to obtain the target folder.
+     * @return array An associative array with the keys:
+     *               - `generations` (int) Number of files that have a generation.
+     *               - `pending` (int) Number of files that are in progress.
+     *               Returns `['generations' => 0, 'pending' => 0]` on failure.
+     */
+    private function getStatisticsRecursive(mixed $requestedFolderIdentifier): array
     {
         $folder = $this->getFolderFromIdentifier($requestedFolderIdentifier);
         $files = $this->getFilesIn($folder);
-        $count = 0;
+        $statistics = ['generations' => 0, 'pending' => 0];
         try {
             foreach ($files as $file) {
-                if (!empty($file['hasGeneration'])) {
-                    if ($file['hasGeneration'] === true) {
-                        $count++;
-                    }
+                if (($file['hasGeneration'] ?? false) === true) {
+                    $statistics['generations']++;
                 }
-            }
-            return $count;
+                if (($file['inProgress'] ?? false) === true) {
+                    $statistics['pending']++;
+                }
+            }            return $statistics;
         } catch (\Throwable $e) {
             // im Fehlerfall ist count einfach 0
-            return $count;
+            return ['generations' => 0, 'pending' => 0];
         }
     }
 

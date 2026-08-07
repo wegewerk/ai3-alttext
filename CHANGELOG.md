@@ -6,7 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
-
+### changed
+- generate Alt-Text for Subfolders in Backend Module
 
 ## [0.9.22] - 2026-07-31
 
@@ -89,7 +90,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ## [0.9.2] - 2026-07-03
 ## changed
 - Dropped TYPO3 v12 Requirement. V12 compatibility will be added when actually needed
-
 
 ## [0.9.1] - 2026-06-25
 ### added

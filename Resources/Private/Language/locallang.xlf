@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-	<file source-language="en" original="EXT:ai3/Resources/Private/Language/locallang.xlf" datatype="plaintext" product-name="ai3" date="2026-06-23T16:06:56+02:00">
+	<file source-language="en" original="EXT:ai3/Resources/Private/Language/locallang.xlf" datatype="plaintext" product-name="ai3" date="2026-08-07T17:31:40+02:00">
 		<header></header>
 		<body>
 			<trans-unit id="generation.alttext">
@@ -108,8 +108,14 @@
 			<trans-unit id="tx_ai3.module.filemetadata.status.queued">
 				<source>queued</source>
 			</trans-unit>
-			<trans-unit id="tx_ai3.module.folderactions.acceptAllGenerationsRecursive">
-				<source>Accept %cntGens Suggestions in %cntFolder Subfolders</source>
+			<trans-unit id="tx_ai3.module.folderactions.generateTitle">
+				<source>Generate alt texts for</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.queue">
+				<source>Queue:</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.generationsPending">
+				<source>%cnt suggestions waiting for approval</source>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.header">
 				<source>Folder Actions</source>
@@ -125,6 +131,15 @@
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.subfolders">
 				<source>Sub Folders</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.tasksPending">
+				<source>%cnt images being processed</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.generateAllShort">
+				<source>All Images</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.generateWithoutAlttextShort">
+				<source>Without Alt text</source>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.modal.alttextError">
 				<source>Unable to generate alttext suggestion.&#x9;&#x9;</source>

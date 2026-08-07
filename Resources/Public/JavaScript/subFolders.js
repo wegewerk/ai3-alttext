@@ -34,6 +34,14 @@ class SubfoldersElement extends LitElement {
             self.reloadFolders();
         });
     }
+    handleGenerateAll(filter, e) {
+        let self = this;
+        this.waitforResult = true;
+        Ai3Api.prototype.createAlttextTasksRecursive(this.folder.identifier, filter).then(() => {
+            this.waitforResult = false;
+            self.reloadFolders();
+        });
+    }
     reloadFolders() {
         let self = this;
         if(this.folder) {
@@ -45,6 +53,7 @@ class SubfoldersElement extends LitElement {
                     self.children = responseBody.children;
                     self.folder = responseBody.folder;
                     self.waitforResult = false;
+                    console.log(self.folder);
                 })
         } else {
             return new Promise((resolve, reject) => { resolve();});
@@ -66,12 +75,31 @@ class SubfoldersElement extends LitElement {
                                 `:lll('tx_ai3.module.folderactions.nosubfolders')
                         }
                         </p>
-                        ${this.folder.countGenerations > 0 ? html`
-                            <button class="btn btn-sm btn-default" @click="${this.handleAcceptAll.bind(this)}">
-                                ${Typo3Icon('actions-approve')}
-                                ${lll('tx_ai3.module.folderactions.acceptAllGenerationsRecursive').replace('%cntGens', this.folder.countGenerations).replace('%cntFolder', this.folder.numSubfolders)}
-                            </button>
-                        `:lll('tx_ai3.module.folderactions.noGenerations').replace('%cntFolder', this.folder.numSubfolders)}
+                        <fieldset>
+                            <legend>${lll('tx_ai3.module.folderactions.generateTitle')}</legend>
+                            <div class="mb-2">
+                                <button class="btn btn-sm btn-default" @click=${this.handleGenerateAll.bind(this, 'all')}>
+                                    ${Typo3Icon('actions-plus')}
+                                    ${lll('tx_ai3.module.folderactions.generateAllShort')}
+                                </button>
+                                <button class="btn btn-sm btn-default" @click=${this.handleGenerateAll.bind(this, 'withoutAlttext')}>
+                                    ${Typo3Icon('actions-plus')}
+                                    ${lll('tx_ai3.module.folderactions.generateWithoutAlttextShort')}
+                                </button>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend class="form-legend">${lll('tx_ai3.module.folderactions.queue')}</legend>
+                            ${this.folder.countGenerations > 0 ? html`
+                                <button class="btn btn-sm btn-default" @click="${this.handleAcceptAll.bind(this)}">
+                                    ${Typo3Icon('actions-approve')}
+                                    ${lll('tx_ai3.module.folderactions.generationsPending').replace('%cnt', this.folder.countGenerations)}
+                                </button>
+                            `:lll('tx_ai3.module.folderactions.noGenerations').replace('%cntFolder', this.folder.numSubfolders)}
+                            ${this.folder.countPending > 0 ? html`
+                                <span>${lll('tx_ai3.module.folderactions.tasksPending').replace('%cnt', this.folder.countPending)}</span>
+                            `:''}
+                        </fieldset>
                         ${this.waitforResult ? html`
                             <typo3-backend-spinner size="small"></typo3-backend-spinner>
                         `:''}

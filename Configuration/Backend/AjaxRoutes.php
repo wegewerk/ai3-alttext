@@ -33,6 +33,10 @@ return [
         'path' => '/ai3/folders/accept-all-suggestions-recursive',
         'target' => \Wegewerk\Ai3Alttext\Controller\Ajax\FolderController::class . '::acceptAllSuggestionsRecursive',
     ],
+    'ai3_folders_create_tasks_recursive' => [
+        'path' => '/ai3/folders/create-tasks-recursive',
+        'target' => \Wegewerk\Ai3Alttext\Controller\Ajax\FolderController::class . '::addAlttextTasksRecursive',
+    ],
     'ai3_folders' => [
         'path' => '/ai3/folders',
         'target' => \Wegewerk\Ai3Alttext\Controller\Ajax\FolderController::class . '::listFolders',

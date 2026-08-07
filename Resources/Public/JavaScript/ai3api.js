@@ -1,6 +1,7 @@
 import AjaxRequest from "@typo3/core/ajax/ajax-request.js";
+import Ai3ApiBase from "@wegewerk/ai3core/ai3api.js";
 
-class Ai3Api {
+class Ai3Api extends Ai3ApiBase {
     createAlttextTask(file) {
         if (file.inProgress) {
             return new Promise((resolve, reject) => {
@@ -63,6 +64,14 @@ class Ai3Api {
         }
         let self = this;
         return new AjaxRequest(TYPO3.settings.ajaxUrls['ai3_folders_acceptAll_recursive'])
+                .post(payload);
+    }
+    createAlttextTasksRecursive(folderIdentifier, filter = 'all') {
+        const payload = {
+            folder: folderIdentifier,
+            filter: filter
+        }
+        return new AjaxRequest(TYPO3.settings.ajaxUrls['ai3_folders_create_tasks_recursive'])
                 .post(payload);
     }
 

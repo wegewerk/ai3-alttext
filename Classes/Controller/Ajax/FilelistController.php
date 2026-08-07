@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Wegewerk\Ai3Alttext\Controller\Ajax;
 
-use Doctrine\DBAL\ParameterType;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Backend\Attribute\AsController;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
-use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
@@ -24,22 +21,20 @@ use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Wegewerk\Ai3Alttext\Domain\Capabilities\AlttextCapability;
 use Wegewerk\Ai3Alttext\Domain\Repository\FilemetadataRepository;
+use Wegewerk\Ai3Alttext\Service\AlttextTaskService;
 use Wegewerk\Ai3Core\Controller\Ajax\AbstractAjaxController;
-use Wegewerk\Ai3Core\Domain\Model\Dto\AddGenerationTask;
-use Wegewerk\Ai3Core\Enums\Status;
 use Wegewerk\Ai3Core\Service\GenerationTaskService;
 
-#[\AllowDynamicProperties]
+#[AllowDynamicProperties]
 #[AsController]
 class FilelistController extends AbstractAjaxController
 {
     public function __construct(
         LoggerInterface $logger,
         private FilemetadataRepository $filemetadataRepository,
-        private AlttextCapability $alttextCapability,
         private GenerationTaskService $generationTaskService,
+        private AlttextTaskService $alttextTaskService,
         protected StorageRepository $storageRepository
     ) {
         parent::__construct(
@@ -109,36 +104,15 @@ class FilelistController extends AbstractAjaxController
         );
     }
 
-    public function addAlttextTaskForFile(ServerRequestInterface $request): ResponseInterface
+public function addAlttextTaskForFile(ServerRequestInterface $request): ResponseInterface
     {
         try {
             $parsedBody = $request->getParsedBody();
             $fileUid = (int)$parsedBody['file'];
-            $langUid = $parsedBody['langUid'] ?? 0;
+            $langUid = (int)($parsedBody['langUid'] ?? 0);
             $langIsoCode = $parsedBody['language'] ?? 'de';
 
-            $metadataUid = $this->filemetadataRepository->getFilemetadataUidForLanguage($fileUid, $langUid);
-            $metadata = $this->filemetadataRepository->getMetadata($fileUid, $langUid);
-
-            $prompt = $metadata['title'] ?? '' . $metadata['description'] ?? '';
-            $service = 'zakaiservice';
-            $imagePath = $this->getImagePath($fileUid);
-            $dto = new AddGenerationTask(
-                Status::pending->value,
-                $prompt,
-                $imagePath,
-                $this->alttextCapability->key,
-                'sys_file_metadata',
-                'alternative',
-                $metadataUid,
-                $langIsoCode,
-                '',
-                '',
-                '',
-                '',
-                ''
-            );
-            $this->generationTaskService->addTask($dto);
+            $this->alttextTaskService->createTaskForFile($fileUid, $langUid, $langIsoCode);
 
             return $this->createJsonSuccessResponse(
                 new Response(),
@@ -215,7 +189,7 @@ class FilelistController extends AbstractAjaxController
                             'publicUrl'     => $file->getPublicUrl(),
                             'editlink'      => $this->generateEditRecordLink($file->getUid(), $langUid),
                             'thumbnailUrl'  => $thumbUrl,
-                            'numrefs'       => (string)$this->getRefs($file->getUid()),
+                            'numrefs'       => (string)$this->alttextTaskService->getRefs($file->getUid()),
                             'title'         => (string)($meta['title'] ?? ''),
                             'description'   => (string)($meta['description'] ?? ''),
                             'alternative'   => (string)($meta['alternative'] ?? ''),
@@ -248,35 +222,6 @@ class FilelistController extends AbstractAjaxController
         return (string)$uriBuilder->buildUriFromRoute('record_edit', $params);
     }
 
-    private function getRefs(int $fileUid)
-    {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable('sys_refindex');
-
-        $predicates = [
-            $queryBuilder->expr()->eq(
-                'ref_table',
-                $queryBuilder->createNamedParameter('sys_file')
-            ),
-            $queryBuilder->expr()->eq(
-                'ref_uid',
-                $queryBuilder->createNamedParameter($fileUid, Connection::PARAM_INT)
-            ),
-            $queryBuilder->expr()->neq(
-                'tablename',
-                $queryBuilder->createNamedParameter('sys_file_metadata')
-            ),
-        ];
-
-        $rows = $queryBuilder
-            ->select('*')
-            ->from('sys_refindex')
-            ->where(...$predicates)
-            ->executeQuery()
-            ->fetchAllAssociative();
-        return count($rows);
-    }
-
     private function countRefs(array $files)
     {
         $numUsedFiles = 0;
@@ -307,30 +252,6 @@ class FilelistController extends AbstractAjaxController
             }
         }
         return $num;
-    }
-
-    private function getImagePath(int $fileUid)
-    {
-        $fileQueryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable('sys_file');
-        $fileRecord = $fileQueryBuilder
-            ->select('identifier', 'storage')
-            ->from('sys_file')
-            ->where(
-                $fileQueryBuilder->expr()->eq('uid', $fileQueryBuilder->createNamedParameter($fileUid, ParameterType::INTEGER))
-            )
-            ->executeQuery()
-            ->fetchAssociative();
-
-        if (!$fileRecord || empty($fileRecord['identifier'])) {
-            throw new \InvalidArgumentException('Datei mit der angegebenen ID nicht gefunden.');
-        }
-
-        $storage = $fileRecord['storage'] ?? 1;
-        $resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
-        $file = $resourceFactory->getFileObjectFromCombinedIdentifier(implode(':', [$storage, $fileRecord['identifier']]));
-
-        return $file->getForLocalProcessing(false);
     }
 
 }

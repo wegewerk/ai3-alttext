@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-	<file source-language="en" target-language="de" original="EXT:ai3/Resources/Private/Language/locallang.xlf" datatype="plaintext" product-name="ai3" date="2026-06-23T16:06:56+02:00">
+	<file source-language="en" target-language="de" original="EXT:ai3/Resources/Private/Language/locallang.xlf" datatype="plaintext" product-name="ai3" date="2026-08-07T17:31:40+02:00">
 		<header></header>
 		<body>
 			<trans-unit id="generation.alttext">
@@ -143,29 +143,49 @@
 				<source>queued</source>
 				<target>in warteschlange</target>
 			</trans-unit>
-			<trans-unit id="tx_ai3.module.folderactions.acceptAllGenerationsRecursive">
-				<source>Accept %cntGens Suggestions in %cntFolder Subfolders</source>
-				<target>%cntGens Vorschläge in %cntFolder Unterordnern annehmen</target>
+			<trans-unit id="tx_ai3.module.folderactions.generateTitle">
+				<source>Generate alt texts for</source>
+				<target>Alt-Texte erzeugen für</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.queue">
+				<source>Queue:</source>
+				<target>Warteschlange:</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.generationsPending">
+				<source>%cnt suggestions waiting for approval</source>
+				<target>%cnt Vorschläge warten auf Bestätigung</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.header">
 				<source>Folder Actions</source>
-				<target>Aktionen auf Unterordner</target>
+				<target>Aktionen für Ordner</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.loading">
 				<source>Loading Folder Info</source>
-				<target>Lade Ordner und Unterordner</target>
+				<target>Lade Ordnerinformationen …</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.noGenerations">
 				<source>No Suggestions found in subolders</source>
-				<target>Keine Vorschläge vorhanden in Unterordnern</target>
+				<target>Keine Vorschläge in den Unterordnern gefunden</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.nosubfolders">
 				<source>No Sub Folders</source>
-				<target>Keine Unterordner</target>
+				<target>Keine Unterordner vorhanden</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.subfolders">
 				<source>Sub Folders</source>
 				<target>Unterordner</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.tasksPending">
+				<source>%cnt images being processed</source>
+				<target>%cnt Bilder werden bearbeitet</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.generateAllShort">
+				<source>All Images</source>
+				<target>Alle Bilder</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.generateWithoutAlttextShort">
+				<source>Without Alt text</source>
+				<target>Ohne Alt-Text</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.modal.alttextError">
 				<source>Unable to generate alttext suggestion.&#x9;&#x9;</source>

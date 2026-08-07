@@ -13,6 +13,20 @@
         "typo3/cms-core": "^13.4.0 | ^14.0",
         "wegewerk/ai3_core": "@dev"
     },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "phpstan/phpstan": "^2.2",
+        "symplify/monorepo-builder": "^12.7",
+        "typo3/coding-standards": "^0.8.0",
+        "typo3/tailor": "^1.7",
+        "typo3/testing-framework": "^9",
+        "phpunit/phpunit": "^12.4"
+    },
+    "scripts": {
+        "cgl:fix": "Build/Scripts/runTests.sh -s cgl",
+        "cgl:check": "Build/Scripts/runTests.sh -s cgl -n",
+        "phpstan": "Build/Scripts/runTests.sh -s phpstan"
+    },
     "autoload": {
         "psr-4": {
             "Wegewerk\\Ai3Alttext\\": "Classes/"
@@ -22,5 +36,13 @@
         "typo3/cms": {
             "extension-key": "ai3_alttext"
         }
+    },
+    "config": {
+        "allow-plugins": {
+            "typo3/cms-composer-installers": true,
+            "typo3/class-alias-loader": true
+        },
+        "bin-dir": ".Build/bin",
+        "vendor-dir": ".Build/vendor"
     }
 }
