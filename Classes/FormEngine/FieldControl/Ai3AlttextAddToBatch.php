@@ -50,6 +50,9 @@ class Ai3AlttextAddToBatch extends AbstractNode
             'javaScriptModules' => [
                 JavaScriptModuleInstruction::create(self::JS_MODULE),
             ],
+            'additionalInlineLanguageLabelFiles' => [
+                'EXT:ai3_alttext/Resources/Private/Language/locallang.xlf'
+            ]
         ];
     }
 
