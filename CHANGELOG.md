@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ## [Unreleased]
 
 
+## [0.9.24] - 2026-08-21
+
+
 ## [0.9.23] - 2026-08-07
 ### changed
 - generate Alt-Text for Subfolders in Backend Module
