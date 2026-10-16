@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/)
 ## [Unreleased]
 
 
+## [0.9.27] - 2026-10-16
+### changed
+- Warnung anzeigen bevor alt-texte erstellt werden.
+
 ## [0.9.26] - 2026-08-24
 
 

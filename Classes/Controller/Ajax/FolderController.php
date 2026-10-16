@@ -179,26 +179,28 @@ class FolderController extends AbstractAjaxController
             try {
                 $folder = $this->getFolderFromIdentifier($requestedFolderIdentifier);
                 $visibleSubfolders = [];
-                $subfolders = $folder->getSubfolders(0, 0, $folder::FILTER_MODE_USE_OWN_AND_STORAGE_FILTERS, true);
+                $subfolders = $folder->getSubfolders(0, 0, $folder::FILTER_MODE_USE_OWN_AND_STORAGE_FILTERS, false);
                 foreach ($subfolders as $subfolder) {
                     if ($subfolder instanceof Folder
                         && !str_contains($subfolder->getIdentifier(), '_processed_')) {
-                        $visibleSubfolders[] = $folder;
+                        $subfolderMetadata = $this->getFolderMetadata($subfolder);
+                        $visibleSubfolders[] = array_merge([
+                            'identifier' => $subfolder->getCombinedIdentifier(),
+                            'name' => $subfolder->getName(),
+                        ], $subfolderMetadata);
                     }
                 }
 
-                $statistics = $this->getStatisticsRecursive($requestedFolderIdentifier);
+                $folderMetadata = $this->getFolderMetadata($folder);
                 return $this->createJsonSuccessResponse(
                     new Response(),
                     [
-                        'folder' => [
+                        'folder' => array_merge([
                             'identifier' => $folder->getCombinedIdentifier(),
                             'name' => $folder->getName(),
                             'storageUid' => $folder->getStorage()->getUid(),
                             'numSubfolders' => count($visibleSubfolders),
-                            'countGenerations' => $statistics['generations'],
-                            'countPending' => $statistics['pending'],
-                        ],
+                        ], $folderMetadata),
                         'children' => $visibleSubfolders,
                     ]
                 );
@@ -255,32 +257,44 @@ class FolderController extends AbstractAjaxController
     }
 
     /**
-     * Zählt wie viele AI Vorschläge bzw. Tasks im Unterordner vorliegen.
-     *
-     * @param mixed $requestedFolderIdentifier Identifier used to obtain the target folder.
-     * @return array An associative array with the keys:
-     *               - `generations` (int) Number of files that have a generation.
-     *               - `pending` (int) Number of files that are in progress.
-     *               Returns `['generations' => 0, 'pending' => 0]` on failure.
+     * @return array{
+     *     imageCount: int,
+     *     imagesWithoutAlttextCount: int,
+     *     hasImagesWithoutAlttext: bool,
+     *     hasImages: bool,
+     *     countGenerations: int,
+     *     countPending: int
+     * }
      */
-    private function getStatisticsRecursive(mixed $requestedFolderIdentifier): array
+    private function getFolderMetadata(FolderInterface $folder): array
     {
-        $folder = $this->getFolderFromIdentifier($requestedFolderIdentifier);
-        $files = $this->getFilesIn($folder);
-        $statistics = ['generations' => 0, 'pending' => 0];
+        $metadata = [
+            'imageCount' => 0,
+            'imagesWithoutAlttextCount' => 0,
+            'hasImagesWithoutAlttext' => false,
+            'hasImages' => false,
+            'countGenerations' => 0,
+            'countPending' => 0,
+        ];
         try {
+            $files = $this->getFilesIn($folder);
+            $metadata['imageCount'] = count($files);
+            $metadata['hasImages'] = $metadata['imageCount'] > 0;
             foreach ($files as $file) {
+                if (($file['alternative'] ?? '') === '') {
+                    $metadata['imagesWithoutAlttextCount']++;
+                }
                 if (($file['hasGeneration'] ?? false) === true) {
-                    $statistics['generations']++;
+                    $metadata['countGenerations']++;
                 }
                 if (($file['inProgress'] ?? false) === true) {
-                    $statistics['pending']++;
+                    $metadata['countPending']++;
                 }
-            }            return $statistics;
+            }
+            $metadata['hasImagesWithoutAlttext'] = $metadata['imagesWithoutAlttextCount'] > 0;
         } catch (\Throwable $e) {
-            // im Fehlerfall ist count einfach 0
-            return ['generations' => 0, 'pending' => 0];
+            // im Fehlerfall Standardwerte zurückgeben
         }
+        return $metadata;
     }
-
 }

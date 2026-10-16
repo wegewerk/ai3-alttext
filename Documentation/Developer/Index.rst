@@ -21,7 +21,7 @@ ai3-alttext follows the capability pattern introduced by
     * - Class
       - Responsibility
     * - ``ZakAiAlttext``
-      - Implements ``ZakAiEndpointInterface``; resizes the image and
+      - Extends ``AbstractZakAiEndpoint``; resizes the image and
         calls the ``/alttexts`` REST endpoint
     * - ``AlttextCapability``
       - Registers the alt text capability under the key ``alttext``
@@ -46,26 +46,29 @@ ai3-alttext follows the capability pattern introduced by
 ZakAiAlttext API class
 ======================
 
-``Wegewerk\Ai3Alttext\Api\ZakAiAlttext`` implements
-``Wegewerk\Ai3Core\Api\ZakAiEndpointInterface`` and exposes a single
-public method:
+``Wegewerk\Ai3Alttext\Api\ZakAiAlttext`` extends
+``Wegewerk\Ai3Core\Api\AbstractZakAiEndpoint`` (implementing
+``ZakAiEndpointInterface``) and exposes a single public method:
 
 .. code-block:: php
     :caption: Classes/Api/ZakAiAlttext.php (signature)
 
-    public function generate(
-        string $imagePath,
-        string $caption,
-        string $language
-    ): string
+    public function generate(array $options = []): string
 
-The method:
+The method accepts an options array:
 
-1. Verifies the image file exists on disk.
+- ``imagePath`` (string, required): Absolute local path to the image file.
+- ``caption`` (string, optional): Contextual text / caption for the image.
+- ``language`` (string, optional): Target language code.
+- ``previous`` (mixed, optional): Previous suggestions to avoid duplication.
+
+The generation flow:
+
+1. Verifies the image file exists on disk (in ``preparePayload()``).
 2. Resizes the image to a maximum of 512 × 512 px using
    ``ImageService`` and ``ImageProcessingService`` to keep API
    payload sizes small.
-3. Base64-encodes the resized image and POSTs it to the
+3. Base64-encodes the resized image into the ``image`` payload field and POSTs it to the
    ``/alttexts`` endpoint via ``ZakAiClient::postJson()``.
 4. Returns the ``alttext`` string from the API response, or an empty
    string if the API reports an error.

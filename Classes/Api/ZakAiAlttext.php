@@ -2,28 +2,33 @@
 
 namespace Wegewerk\Ai3Alttext\Api;
 
-use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Resource\Service\ImageProcessingService;
 use TYPO3\CMS\Extbase\Service\ImageService;
+use Wegewerk\Ai3Core\Api\AbstractZakAiEndpoint;
 use Wegewerk\Ai3Core\Api\ZakAiClient;
-use Wegewerk\Ai3Core\Api\ZakAiEndpointInterface;
 
 /**
- * Implemets the API Endpoint related to a alt text generation
+ * Implements the API Endpoint related to alt text generation
  */
-class ZakAiAlttext implements ZakAiEndpointInterface
+class ZakAiAlttext extends AbstractZakAiEndpoint
 {
+    protected string $endpoint = 'alttexts';
+    protected string $responseKey = 'alttext';
+    protected array $requiredOptions = [ 'image' ];
+    protected array $optionalOptions = [ 'caption', 'language', 'previous' ];
+
     public function __construct(
-        private ZakAiClient $client,
-        private LoggerInterface $logger,
-        private readonly ImageService $imageService,
-        private readonly ImageProcessingService $imageProcessingService
-    ) {}
+        ZakAiClient                             $client,
+        private readonly ImageService           $imageService,
+        private readonly ImageProcessingService $imageProcessingService,
+        ?LoggerInterface                        $logger = null
+    ) {
+        parent::__construct($client, $logger);
+    }
 
-    public function generate(string $imagePath, string $caption, string $language): string
-    {
-
+    protected function preparePayload(array $payload, array $options): array {
+        $imagePath = (string)($options['imagePath'] ?? '');
         if (!file_exists($imagePath)) {
             throw new \InvalidArgumentException('Bilddatei nicht gefunden: ' . $imagePath);
         }
@@ -31,54 +36,47 @@ class ZakAiAlttext implements ZakAiEndpointInterface
         try {
             $resizedPath = $this->getResizedImagePath($imagePath, 512);
             if ($resizedPath !== $imagePath) {
-                $this->logger->debug(
-                    'Bild wurde für Alttext-Erzeugung skaliert.',
+                $this->logger?->debug('Bild wurde für Alttext-Erzeugung skaliert.',
                     [
                         'original' => $imagePath,
                         'resized'  => $resizedPath,
-                    ]
-                );
+                    ]);
             }
         } catch (\RuntimeException $e) {
-            $this->logger->error('generateAlttext Fehler: ' . $e->getMessage());
+            $this->logger?->error('generateAlttext Fehler: ' . $e->getMessage());
             throw new \InvalidArgumentException('generateAlttext Fehler: ' . $e->getMessage());
         }
 
-        $imageData = base64_encode(file_get_contents($resizedPath));
+        unset($payload['imagePath']);
+        $payload['image'] = base64_encode(file_get_contents($resizedPath));
 
-            $response = $this->client->postJson(
-                'alttexts',
-                [
-                    'image'    => $imageData,
-                    'language' => $language ?? 'de',
-                    'caption'  => $caption ?? '',
-                ]
-            );
+        return $payload;
+    }
 
-            $this->logger->debug('Zak_ai API Antwort: ', $response);
+    protected function extractResult(array $response): string {
+        if (($response['status'] ?? '') === 'OK' && isset($response[$this->responseKey])) {
+            return (string)$response[$this->responseKey];
+        }
 
-            if ($response['status'] === 'OK') {
-                return $response['alttext'];
-            }
+        if (isset($response[$this->responseKey])) {
+            return (string)$response[$this->responseKey];
+        }
 
-            $this->logger->error('Zak_ai API Fehler', [
+        $this->logger?->error('Zak_ai API Fehler',
+            [
                 'result' => $response,
             ]);
 
-            return '';
-
+        return '';
     }
 
-    private function getResizedImagePath(string $imagePath, int $maxDimension = 512): string
-    {
+    private function getResizedImagePath(string $imagePath, int $maxDimension = 512): string {
         $image = $this->imageService->getImage($imagePath, null, false);
-        $processed = $this->imageService->applyProcessingInstructions(
-            $image,
+        $processed = $this->imageService->applyProcessingInstructions($image,
             [
                 'maxWidth'  => $maxDimension,
                 'maxHeight' => $maxDimension,
-            ]
-        );
+            ]);
         // wenn der scheduler über das Backend aufgerufen wurde, werden die Bilder
         // nicht sofort prozessiert, es wird nur eine processingURL erzeugt (DeferredBackendImageProcessor).
         // diesen Zustand versuchen wir nicht zu erkennen, wir rufen imageProcessingService->process einfach immer auf
@@ -93,5 +91,4 @@ class ZakAiAlttext implements ZakAiEndpointInterface
         }
         throw new \RuntimeException('local file not found: ' . $imagePath, 1764593834846);
     }
-
 }

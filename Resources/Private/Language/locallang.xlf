@@ -141,6 +141,39 @@
 			<trans-unit id="tx_ai3.module.folderactions.generateWithoutAlttextShort">
 				<source>Without Alt text</source>
 			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.notif.generatingAll">
+				<source>Creating AI alt-text tasks for %cnt image(s)...</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.notif.generatingWithoutAlttext">
+				<source>Creating AI alt-text tasks for %cnt image(s) without alternative text...</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.notif.acceptingAll">
+				<source>Accepting and applying %cnt AI alt-text suggestion(s)...</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.notif.noFiles">
+				<source>No images found matching the selected action criteria.</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.notif.noSuggestions">
+				<source>No AI suggestions available to accept.</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.confirmTitle">
+				<source>Confirm Action</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.confirm.generatingAll">
+				<source>Are you sure you want to create AI alt-text tasks for %cnt image(s)?</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.confirm.generatingWithoutAlttext">
+				<source>Are you sure you want to create AI alt-text tasks for %cnt image(s) without alternative text?</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.confirm.acceptAll">
+				<source>Are you sure you want to accept and apply %cnt AI alt-text suggestion(s)?</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.confirm">
+				<source>OK</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.cancel">
+				<source>Cancel</source>
+			</trans-unit>
 			<trans-unit id="tx_ai3.module.modal.alttextError">
 				<source>Unable to generate alttext suggestion.&#x9;&#x9;</source>
 			</trans-unit>

@@ -187,6 +187,50 @@
 				<source>Without Alt text</source>
 				<target>Ohne Alt-Text</target>
 			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.notif.generatingAll">
+				<source>Creating AI alt-text tasks for %cnt image(s)...</source>
+				<target>Erstelle KI-Alt-Text-Aufgaben für %cnt Bild(er)...</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.notif.generatingWithoutAlttext">
+				<source>Creating AI alt-text tasks for %cnt image(s) without alternative text...</source>
+				<target>Erstelle KI-Alt-Text-Aufgaben für %cnt Bild(er) ohne Alternativtext...</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.notif.acceptingAll">
+				<source>Accepting and applying %cnt AI alt-text suggestion(s)...</source>
+				<target>Übernehme %cnt KI-Alternativtext-Vorschlag/-Vorschläge...</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.notif.noFiles">
+				<source>No images found matching the selected action criteria.</source>
+				<target>Keine passenden Bilder für die ausgewählte Aktion gefunden.</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.notif.noSuggestions">
+				<source>No AI suggestions available to accept.</source>
+				<target>Keine KI-Vorschläge zum Übernehmen vorhanden.</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.confirmTitle">
+				<source>Confirm Action</source>
+				<target>Aktion bestätigen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.confirm.generatingAll">
+				<source>Are you sure you want to create AI alt-text tasks in the hightlighted folders for %cnt image(s)?</source>
+				<target>Alt-Texte für %cnt Bilder in den markierten Ordnern erstellen?</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.confirm.generatingWithoutAlttext">
+				<source>Are you sure you want to create AI alt-text tasks for %cnt image(s) in the hightlighted Folders without alternative text?</source>
+				<target>Alt-Texte für %cnt Bilder ohne Alternativtext in den markierten Ordnern erstellen?</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.confirm.acceptAll">
+				<source>Are you sure you want to accept and apply %cnt AI alt-text suggestion(s)?</source>
+				<target>Möchten Sie wirklich %cnt KI-Alternativtext-Vorschlag/-Vorschläge übernehmen?</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.confirm">
+				<source>OK</source>
+				<target>OK</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.cancel">
+				<source>Cancel</source>
+				<target>Abbrechen</target>
+			</trans-unit>
 			<trans-unit id="tx_ai3.module.modal.alttextError">
 				<source>Unable to generate alttext suggestion.&#x9;&#x9;</source>
 				<target>Es kann kein Alternativtext generiert werden.</target>
