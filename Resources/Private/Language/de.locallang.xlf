@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-	<file source-language="en" target-language="de" original="EXT:ai3/Resources/Private/Language/locallang.xlf" datatype="plaintext" product-name="ai3" date="2026-08-07T17:31:40+02:00">
+	<file source-language="en" target-language="de" original="EXT:ai3/Resources/Private/Language/locallang.xlf" datatype="plaintext" product-name="ai3" date="2026-10-20T18:39:33+02:00">
 		<header></header>
 		<body>
 			<trans-unit id="generation.alttext">
@@ -143,13 +143,53 @@
 				<source>queued</source>
 				<target>in warteschlange</target>
 			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.awaitingApprovalTitle">
+				<source>Suggestions waiting for approval</source>
+				<target>Vorschläge warten auf Bestätigung</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.awaitungApprovalShort">
+				<source>awaiting approval</source>
+				<target>zu bestätigen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.cancel">
+				<source>Cancel</source>
+				<target>Abbrechen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.confirm">
+				<source>OK</source>
+				<target>OK</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.confirm.acceptAll">
+				<source>Are you sure you want to accept and apply %cnt AI alt-text suggestion(s)?</source>
+				<target>Möchten Sie wirklich %cnt KI-Alternativtext-Vorschlag/-Vorschläge übernehmen?</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.confirm.generatingAll">
+				<source>Are you sure you want to create AI alt-text tasks for %cnt image(s)?</source>
+				<target>Alt-Texte für %cnt Bilder in den markierten Ordnern erstellen?</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.confirm.generatingWithoutAlttext">
+				<source>Are you sure you want to create AI alt-text tasks for %cnt image(s)?</source>
+				<target>Alt-Texte für %cnt Bilder in den markierten Ordnern erstellen?</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.confirmTitle">
+				<source>Confirm Action</source>
+				<target>Aktion bestätigen</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.generateAll">
+				<source>All Images without alt-Text</source>
+				<target>Alle Bilder ohne Alt-Text</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.generateAllShort">
+				<source>Images</source>
+				<target>Bilder</target>
+			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.generateTitle">
 				<source>Generate alt texts for</source>
 				<target>Alt-Texte erzeugen für</target>
 			</trans-unit>
-			<trans-unit id="tx_ai3.module.folderactions.queue">
-				<source>Queue:</source>
-				<target>Warteschlange:</target>
+			<trans-unit id="tx_ai3.module.folderactions.generateWithoutAlttextShort">
+				<source>without Alt text</source>
+				<target>davon ohne Alt-Text</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.generationsPending">
 				<source>%cnt suggestions waiting for approval</source>
@@ -171,21 +211,9 @@
 				<source>No Sub Folders</source>
 				<target>Keine Unterordner vorhanden</target>
 			</trans-unit>
-			<trans-unit id="tx_ai3.module.folderactions.subfolders">
-				<source>Sub Folders</source>
-				<target>Unterordner</target>
-			</trans-unit>
-			<trans-unit id="tx_ai3.module.folderactions.tasksPending">
-				<source>%cnt images being processed</source>
-				<target>%cnt Bilder werden bearbeitet</target>
-			</trans-unit>
-			<trans-unit id="tx_ai3.module.folderactions.generateAllShort">
-				<source>All Images</source>
-				<target>Alle Bilder</target>
-			</trans-unit>
-			<trans-unit id="tx_ai3.module.folderactions.generateWithoutAlttextShort">
-				<source>Without Alt text</source>
-				<target>Ohne Alt-Text</target>
+			<trans-unit id="tx_ai3.module.folderactions.notif.acceptingAll">
+				<source>Accepting and applying %cnt AI alt-text suggestion(s)...</source>
+				<target>Übernehme %cnt KI-Alternativtext-Vorschlag/-Vorschläge...</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.notif.generatingAll">
 				<source>Creating AI alt-text tasks for %cnt image(s)...</source>
@@ -195,10 +223,6 @@
 				<source>Creating AI alt-text tasks for %cnt image(s) without alternative text...</source>
 				<target>Erstelle KI-Alt-Text-Aufgaben für %cnt Bild(er) ohne Alternativtext...</target>
 			</trans-unit>
-			<trans-unit id="tx_ai3.module.folderactions.notif.acceptingAll">
-				<source>Accepting and applying %cnt AI alt-text suggestion(s)...</source>
-				<target>Übernehme %cnt KI-Alternativtext-Vorschlag/-Vorschläge...</target>
-			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.notif.noFiles">
 				<source>No images found matching the selected action criteria.</source>
 				<target>Keine passenden Bilder für die ausgewählte Aktion gefunden.</target>
@@ -207,29 +231,25 @@
 				<source>No AI suggestions available to accept.</source>
 				<target>Keine KI-Vorschläge zum Übernehmen vorhanden.</target>
 			</trans-unit>
-			<trans-unit id="tx_ai3.module.folderactions.confirmTitle">
-				<source>Confirm Action</source>
-				<target>Aktion bestätigen</target>
+			<trans-unit id="tx_ai3.module.folderactions.queue">
+				<source>Queue:</source>
+				<target>Warteschlange:</target>
 			</trans-unit>
-			<trans-unit id="tx_ai3.module.folderactions.confirm.generatingAll">
-				<source>Are you sure you want to create AI alt-text tasks in the hightlighted folders for %cnt image(s)?</source>
-				<target>Alt-Texte für %cnt Bilder in den markierten Ordnern erstellen?</target>
+			<trans-unit id="tx_ai3.module.folderactions.queueAwaitingApproval">
+				<source>awaiting approval</source>
+				<target>wartet auf Bestätigung</target>
 			</trans-unit>
-			<trans-unit id="tx_ai3.module.folderactions.confirm.generatingWithoutAlttext">
-				<source>Are you sure you want to create AI alt-text tasks for %cnt image(s) in the hightlighted Folders without alternative text?</source>
-				<target>Alt-Texte für %cnt Bilder ohne Alternativtext in den markierten Ordnern erstellen?</target>
+			<trans-unit id="tx_ai3.module.folderactions.queueProcessing">
+				<source>processing</source>
+				<target>wird bearbeitet</target>
 			</trans-unit>
-			<trans-unit id="tx_ai3.module.folderactions.confirm.acceptAll">
-				<source>Are you sure you want to accept and apply %cnt AI alt-text suggestion(s)?</source>
-				<target>Möchten Sie wirklich %cnt KI-Alternativtext-Vorschlag/-Vorschläge übernehmen?</target>
+			<trans-unit id="tx_ai3.module.folderactions.subfolders">
+				<source>Sub Folders</source>
+				<target>Unterordner</target>
 			</trans-unit>
-			<trans-unit id="tx_ai3.module.folderactions.confirm">
-				<source>OK</source>
-				<target>OK</target>
-			</trans-unit>
-			<trans-unit id="tx_ai3.module.folderactions.cancel">
-				<source>Cancel</source>
-				<target>Abbrechen</target>
+			<trans-unit id="tx_ai3.module.folderactions.tasksPending">
+				<source>%cnt images being processed</source>
+				<target>%cnt Bilder werden bearbeitet</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.modal.alttextError">
 				<source>Unable to generate alttext suggestion.&#x9;&#x9;</source>

@@ -4,6 +4,7 @@ import {ModuleStateStorage as ModuleState} from "@typo3/backend/storage/module-s
 import {html, render} from 'lit-html';
 import {LitElement } from 'lit-element';
 import Ai3Api from './ai3api.js'
+import "@wegewerk/ai3core/creditsElement.js";
 import Typo3Icon from "@wegewerk/ai3core/Typo3Icon.js";
 
 class SubfoldersElement extends LitElement {
@@ -153,6 +154,22 @@ class SubfoldersElement extends LitElement {
         }
     }
 
+    renderQueueImage(file, badgeLabel) {
+        return html`
+            <div class="text-center">
+                ${file.thumbnailUrl ? html`
+                    <img src="${file.thumbnailUrl}" alt="${file.name}" title="${file.name}"
+                         class="rounded border" style="width: 96px; height: 72px; object-fit: cover;">
+                ` : html`
+                    <div class="rounded border bg-light d-flex align-items-center justify-content-center"
+                         style="width: 96px; height: 72px;">${Typo3Icon('default-content-file-unknown', 'medium')}</div>
+                `}
+                <div class="small text-truncate" style="max-width: 96px;" title="${file.name}">${file.name}</div>
+                ${badgeLabel}
+            </div>
+        `;
+    }
+
     render() {
         let self = this;
         const isRootAffected = this.isAffected(this.folder);
@@ -165,6 +182,9 @@ class SubfoldersElement extends LitElement {
                                 <thead>
                                     <tr>
                                         <th>${lll('tx_ai3_alttext.module.actionmenu.folders')}</th>
+                                        ${this.folder.countGenerations > 0 ? html`
+                                            <th class="text-end">${lll('tx_ai3.module.folderactions.awaitungApprovalShort')}</th>
+                                        ` : ''}
                                         <th class="text-end">${lll('tx_ai3.module.folderactions.generateAllShort')}</th>
                                         <th class="text-end">${lll('tx_ai3.module.folderactions.generateWithoutAlttextShort')}</th>
                                     </tr>
@@ -174,10 +194,13 @@ class SubfoldersElement extends LitElement {
                                         <td class="${isRootAffected ? 'bg-warning fw-bold' : ''}">
                                             ${Typo3Icon('actions-folder')} <span class="badge ms-1">${this.folder.identifier}</span>
                                             <button class="btn btn-sm btn-link p-0 ms-1 text-decoration-none" title="Refresh" @click="${this.reloadFolders.bind(this)}">${Typo3Icon('actions-refresh')}</button>
-                                            ${this.folder.countGenerations > 0 ? html`
-                                                <span class="badge badge-info text-bg-info ms-1" title="${this.folder.countGenerations} AI generations">${this.folder.countGenerations}</span>
-                                            ` : ''}
                                         </td>
+                                        ${this.folder.countGenerations > 0 ? html`
+                                            <td class="text-end ${isRootAffected ? 'bg-warning fw-bold' : ''}">
+                                                <span class="badge badge-info text-bg-info ms-1"
+                                                      title="${this.folder.countGenerations} AI generations">${this.folder.countGenerations}</span>
+                                            </td>
+                                        ` : ''}
                                         <td class="text-end ${isRootAffected ? 'bg-warning fw-bold' : ''}">
                                             <span class="badge ${this.folder.imageCount > 0 ? 'badge-secondary text-bg-secondary' : 'badge-light text-bg-light text-muted'}">${this.folder.imageCount}</span>
                                         </td>
@@ -195,18 +218,21 @@ class SubfoldersElement extends LitElement {
                                             <tr style="transition: background-color 0.2s ease;">
                                                 <td class="ps-3 ${affected ? 'bg-warning fw-bold' : ''}">
                                                     ${Typo3Icon('actions-folder')} <span class="ms-1">${child.name}</span>
+                                                </td>
+                                                ${this.folder.countGenerations > 0 ? html` <td class="text-end ${affected ? 'bg-warning fw-bold' : ''}">
                                                     ${child.countGenerations > 0 ? html`
                                                         <span class="badge badge-info text-bg-info ms-1" title="${child.countGenerations} AI generations">${child.countGenerations}</span>
                                                     ` : ''}
                                                 </td>
+                                                ` : ''}
                                                 <td class="text-end ${affected ? 'bg-warning fw-bold' : ''}">
-                                                    <span class="badge ${child.imageCount > 0 ? 'badge-secondary text-bg-secondary' : 'badge-light text-bg-light text-muted'}">${child.imageCount}</span>
+                                                    <span class="badge ${child.imageCount > 0 ? 'badge-secondary text-bg-secondary' : 'badge-light text-bg-secondary'}">${child.imageCount}</span>
                                                 </td>
                                                 <td class="text-end ${affected ? 'bg-warning fw-bold' : ''}">
                                                     ${child.imagesWithoutAlttextCount > 0 ? html`
                                                         <span class="badge badge-warning text-bg-warning">${child.imagesWithoutAlttextCount}</span>
                                                     ` : html`
-                                                        <span class="badge badge-light text-bg-light text-muted">0</span>
+                                                        <span class="badge badge-light text-bg-secondary">0</span>
                                                     `}
                                                 </td>
                                             </tr>
@@ -234,27 +260,11 @@ class SubfoldersElement extends LitElement {
                             <fieldset class="mb-3">
                                 <legend class="form-legend">${lll('tx_ai3.module.folderactions.generateTitle')}</legend>
                                 <div class="mb-2">
-                                    <button class="btn btn-sm btn-default" @click=${this.handleGenerateAll.bind(this, 'all')}>
-                                        ${Typo3Icon('actions-plus')}
-                                        ${lll('tx_ai3.module.folderactions.generateAllShort')}
-                                    </button>
                                     <button class="btn btn-sm btn-default" @click=${this.handleGenerateAll.bind(this, 'withoutAlttext')}>
                                         ${Typo3Icon('actions-plus')}
-                                        ${lll('tx_ai3.module.folderactions.generateWithoutAlttextShort')}
+                                        ${lll('tx_ai3.module.folderactions.generateAll')}
                                     </button>
                                 </div>
-                            </fieldset>
-                            <fieldset>
-                                <legend class="form-legend">${lll('tx_ai3.module.folderactions.queue')}</legend>
-                                ${this.folder.countGenerations > 0 ? html`
-                                    <button class="btn btn-sm btn-default" @click="${this.handleAcceptAll.bind(this)}">
-                                        ${Typo3Icon('actions-approve')}
-                                        ${lll('tx_ai3.module.folderactions.generationsPending').replace('%cnt', this.folder.countGenerations)}
-                                    </button>
-                                `:lll('tx_ai3.module.folderactions.noGenerations').replace('%cntFolder', this.folder.numSubfolders)}
-                                ${this.folder.countPending > 0 ? html`
-                                    <span class="ms-1">${lll('tx_ai3.module.folderactions.tasksPending').replace('%cnt', this.folder.countPending)}</span>
-                                `:''}
                             </fieldset>
                         `}
                         ${this.waitforResult ? html`
@@ -263,9 +273,38 @@ class SubfoldersElement extends LitElement {
                             </div>
                         `:''}
                     </div>
+                    ${(this.folder.queueFiles || []).filter((file) => file.hasGeneration && !file.inProgress).length > 0 ? html`
+                        <fieldset class="mb-3">
+                            <legend class="form-legend">${lll('tx_ai3.module.folderactions.awaitingApprovalTitle')}</legend>
+                            <div class="d-flex flex-wrap gap-3">
+                                ${this.folder.queueFiles.filter((file) => file.hasGeneration && !file.inProgress).map((file) => this.renderQueueImage(file, html`
+                                    <span class="badge text-bg-info">${lll('tx_ai3.module.folderactions.queueAwaitingApproval')}</span>
+                                `))}
+                            </div>
+                        </fieldset>
+                    ` : ''}
+                    <fieldset>
+                        <legend class="form-legend">${lll('tx_ai3.module.folderactions.queue')}</legend>
+                        ${this.folder.countGenerations > 0 ? html`
+                                    <button class="btn btn-sm btn-default" @click="${this.handleAcceptAll.bind(this)}">
+                                        ${Typo3Icon('actions-approve')}
+                                        ${lll('tx_ai3.module.folderactions.generationsPending').replace('%cnt', this.folder.countGenerations)}
+                                    </button>
+                                `:lll('tx_ai3.module.folderactions.noGenerations').replace('%cntFolder', this.folder.numSubfolders)}
+                        ${this.folder.countPending > 0 ? html`
+                                    <span class="ms-1">${lll('tx_ai3.module.folderactions.tasksPending').replace('%cnt', this.folder.countPending)}</span>
+                                `:''}
+                        ${(this.folder.queueFiles || []).filter((file) => file.inProgress).length > 0 ? html`
+                            <div class="d-flex flex-wrap gap-3 mt-2">
+                                ${this.folder.queueFiles.filter((file) => file.inProgress).map((file) => this.renderQueueImage(file, html`
+                                    <span class="badge text-bg-secondary">${lll('tx_ai3.module.folderactions.queueProcessing')}</span>
+                                `))}
+                            </div>
+                        ` : ''}
+                    </fieldset>
                 </div>
             </div>
-            
+
         `;
     }
 }

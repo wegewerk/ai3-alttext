@@ -6,10 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
-
+### added
+- Display images in the queue (processing / awaiting confirmation) as thumbnails in the subfolders view.
+### fixed
+- bug that prevents alt-texts from being generated
 
 ## [0.9.28] - 2026-10-19
-
 
 ## [0.9.27] - 2026-10-19
 

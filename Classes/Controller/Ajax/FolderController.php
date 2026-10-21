@@ -16,6 +16,7 @@ use TYPO3\CMS\Core\Resource\FileType;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\MetaDataAspect;
+use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -191,7 +192,7 @@ class FolderController extends AbstractAjaxController
                     }
                 }
 
-                $folderMetadata = $this->getFolderMetadata($folder);
+                $folderMetadata = $this->getFolderMetadata($folder, true);
                 return $this->createJsonSuccessResponse(
                     new Response(),
                     [
@@ -223,7 +224,7 @@ class FolderController extends AbstractAjaxController
         }
     }
 
-    private function getFilesIn(FolderInterface $folder, $langUid = 0, bool $includeRefs = false): array
+    private function getFilesIn(FolderInterface $folder, $langUid = 0, bool $includeRefs = false, bool $includeThumbnails = false): array
     {
         $filesData = [];
         $files = $folder->getFiles(0, 0, $folder::FILTER_MODE_USE_OWN_AND_STORAGE_FILTERS, true);
@@ -243,17 +244,32 @@ class FolderController extends AbstractAjaxController
                         }
                         $filesData[] = [
                             'uid' => $file->getUid(),
+                            'name' => $file->getName(),
                             'hasGeneration' => $hasGeneration,
                             'metadataUid' => $metadataUid,
                             'alternative' => (string)($meta['alternative'] ?? ''),
                             'inProgress' => $this->generationTaskService->isTaskRunning($metadataUid),
                             'numrefs' => $includeRefs ? $this->alttextTaskService->getRefs($file->getUid()) : 0,
+                            'thumbnailUrl' => $includeThumbnails ? $this->getThumbnailUrl($file) : null,
                         ];
                     }
                 }
             }
         }
         return $filesData;
+    }
+
+    private function getThumbnailUrl(FileInterface $file): ?string
+    {
+        try {
+            $processed = $file->process(ProcessedFile::CONTEXT_IMAGEPREVIEW, [
+                'width' => 200,
+                'height' => 150,
+            ]);
+            return $processed->getPublicUrl();
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     /**
@@ -263,10 +279,11 @@ class FolderController extends AbstractAjaxController
      *     hasImagesWithoutAlttext: bool,
      *     hasImages: bool,
      *     countGenerations: int,
-     *     countPending: int
+     *     countPending: int,
+     *     queueFiles: array
      * }
      */
-    private function getFolderMetadata(FolderInterface $folder): array
+    private function getFolderMetadata(FolderInterface $folder, bool $withQueueFiles = false): array
     {
         $metadata = [
             'imageCount' => 0,
@@ -275,9 +292,10 @@ class FolderController extends AbstractAjaxController
             'hasImages' => false,
             'countGenerations' => 0,
             'countPending' => 0,
+            'queueFiles' => [],
         ];
         try {
-            $files = $this->getFilesIn($folder);
+            $files = $this->getFilesIn($folder, 0, false, $withQueueFiles);
             $metadata['imageCount'] = count($files);
             $metadata['hasImages'] = $metadata['imageCount'] > 0;
             foreach ($files as $file) {
@@ -289,6 +307,15 @@ class FolderController extends AbstractAjaxController
                 }
                 if (($file['inProgress'] ?? false) === true) {
                     $metadata['countPending']++;
+                }
+                if ($withQueueFiles && (($file['inProgress'] ?? false) === true || ($file['hasGeneration'] ?? false) === true)) {
+                    $metadata['queueFiles'][] = [
+                        'uid' => $file['uid'],
+                        'name' => $file['name'],
+                        'thumbnailUrl' => $file['thumbnailUrl'],
+                        'inProgress' => (bool)($file['inProgress'] ?? false),
+                        'hasGeneration' => (bool)($file['hasGeneration'] ?? false),
+                    ];
                 }
             }
             $metadata['hasImagesWithoutAlttext'] = $metadata['imagesWithoutAlttextCount'] > 0;
