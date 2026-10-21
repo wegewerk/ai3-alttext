@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
+
+
+## [0.9.29] - 2026-10-21
 ### added
 - Display images in the queue (processing / awaiting confirmation) as thumbnails in the subfolders view.
 ### fixed
