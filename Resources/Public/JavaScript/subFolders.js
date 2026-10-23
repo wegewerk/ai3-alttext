@@ -5,6 +5,7 @@ import {html, render} from 'lit-html';
 import {LitElement } from 'lit-element';
 import Ai3Api from './ai3api.js'
 import "@wegewerk/ai3core/creditsElement.js";
+import "./queueImageElement.js";
 import Typo3Icon from "@wegewerk/ai3core/Typo3Icon.js";
 
 class SubfoldersElement extends LitElement {
@@ -154,18 +155,55 @@ class SubfoldersElement extends LitElement {
         }
     }
 
-    renderQueueImage(file, badgeLabel) {
+    handleProcessQueue() {
+        let self = this;
+        this.waitforResult = true;
+        this.activeAction = 'processQueue';
+        Ai3Api.prototype.processQueue()
+            .then(async function (response) {
+                const resolved = await response.resolve();
+                const responseBody = JSON.parse(resolved);
+                self.waitforResult = false;
+                self.activeAction = null;
+                Notification.success(
+                    lll('tx_ai3.module.folderactions.header'),
+                    lll('tx_ai3.module.folderactions.notif.queueProcessed').replace('%cnt', responseBody.processed ?? 0)
+                );
+                self.reloadFolders();
+            })
+            .catch(async function (response) {
+                self.waitforResult = false;
+                self.activeAction = null;
+                let message = lll('tx_ai3.module.folderactions.notif.queueProcessError');
+                try {
+                    const resolved = await response.resolve();
+                    const responseBody = JSON.parse(resolved);
+                    if (responseBody.message) {
+                        message = responseBody.message;
+                    }
+                } catch (e) {
+                    message = message || lll('tx_ai3.module.folderactions.notif.queueProcessError');
+                }
+                Notification.error(lll('tx_ai3.module.folderactions.header'), message);
+            });
+    }
+
+    renderConfirmAlert() {
+        if (!this.pendingAction) {
+            return '';
+        }
         return html`
-            <div class="text-center">
-                ${file.thumbnailUrl ? html`
-                    <img src="${file.thumbnailUrl}" alt="${file.name}" title="${file.name}"
-                         class="rounded border" style="width: 96px; height: 72px; object-fit: cover;">
-                ` : html`
-                    <div class="rounded border bg-light d-flex align-items-center justify-content-center"
-                         style="width: 96px; height: 72px;">${Typo3Icon('default-content-file-unknown', 'medium')}</div>
-                `}
-                <div class="small text-truncate" style="max-width: 96px;" title="${file.name}">${file.name}</div>
-                ${badgeLabel}
+            <div class="alert alert-info mb-0" role="alert">
+                <h5 class="alert-heading mb-2">${lll('tx_ai3.module.folderactions.confirmTitle') || 'Confirm Action'}</h5>
+                <p class="mb-3">${this.pendingAction.message}</p>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-primary" @click="${this.handleConfirmAction.bind(this)}">
+                        ${lll('tx_ai3.module.folderactions.confirm') || 'OK'}
+                    </button>
+                    <button class="btn btn-sm btn-default" @click="${this.handleCancelAction.bind(this)}">
+                        ${lll('tx_ai3.module.folderactions.cancel') || 'Cancel'}
+                    </button>
+                </div>
             </div>
         `;
     }
@@ -173,6 +211,9 @@ class SubfoldersElement extends LitElement {
     render() {
         let self = this;
         const isRootAffected = this.isAffected(this.folder);
+        const inProgressFiles = (this.folder.queueFiles || []).filter((file) => file.inProgress);
+        const hasQueue = this.folder.countPending > 0 || inProgressFiles.length > 0;
+        const nothingToDo = !hasQueue && !(this.folder.imagesWithoutAlttextCount > 0);
         return this.folder.name == null ? html`${lll('tx_ai3.module.folderactions.loading')} <typo3-backend-spinner size="small"></typo3-backend-spinner>`: html`
             <div class="mb-3 text-muted" data-content="folderMeta">
                 <div class="row">
@@ -243,20 +284,7 @@ class SubfoldersElement extends LitElement {
                         </div>
                     </div>
                     <div class="col">
-                        ${this.pendingAction ? html`
-                            <div class="alert alert-info" role="alert">
-                                <h5 class="alert-heading mb-2">${lll('tx_ai3.module.folderactions.confirmTitle') || 'Confirm Action'}</h5>
-                                <p class="mb-3">${this.pendingAction.message}</p>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-sm btn-primary" @click="${this.handleConfirmAction.bind(this)}">
-                                        ${lll('tx_ai3.module.folderactions.confirm') || 'OK'}
-                                    </button>
-                                    <button class="btn btn-sm btn-default" @click="${this.handleCancelAction.bind(this)}">
-                                        ${lll('tx_ai3.module.folderactions.cancel') || 'Cancel'}
-                                    </button>
-                                </div>
-                            </div>
-                        ` : html`
+                        ${this.pendingAction && this.pendingAction.action !== 'accept' ? this.renderConfirmAlert() : html`
                             <fieldset class="mb-3">
                                 <legend class="form-legend">${lll('tx_ai3.module.folderactions.generateTitle')}</legend>
                                 <div class="mb-2">
@@ -267,42 +295,95 @@ class SubfoldersElement extends LitElement {
                                 </div>
                             </fieldset>
                         `}
-                        ${this.waitforResult ? html`
-                            <div class="mt-2">
-                                <typo3-backend-spinner size="small"></typo3-backend-spinner>
-                            </div>
-                        `:''}
                     </div>
-                    ${(this.folder.queueFiles || []).filter((file) => file.hasGeneration && !file.inProgress).length > 0 ? html`
-                        <fieldset class="mb-3">
-                            <legend class="form-legend">${lll('tx_ai3.module.folderactions.awaitingApprovalTitle')}</legend>
-                            <div class="d-flex flex-wrap gap-3">
-                                ${this.folder.queueFiles.filter((file) => file.hasGeneration && !file.inProgress).map((file) => this.renderQueueImage(file, html`
-                                    <span class="badge text-bg-info">${lll('tx_ai3.module.folderactions.queueAwaitingApproval')}</span>
-                                `))}
-                            </div>
-                        </fieldset>
-                    ` : ''}
-                    <fieldset>
-                        <legend class="form-legend">${lll('tx_ai3.module.folderactions.queue')}</legend>
-                        ${this.folder.countGenerations > 0 ? html`
-                                    <button class="btn btn-sm btn-default" @click="${this.handleAcceptAll.bind(this)}">
-                                        ${Typo3Icon('actions-approve')}
-                                        ${lll('tx_ai3.module.folderactions.generationsPending').replace('%cnt', this.folder.countGenerations)}
-                                    </button>
-                                `:lll('tx_ai3.module.folderactions.noGenerations').replace('%cntFolder', this.folder.numSubfolders)}
-                        ${this.folder.countPending > 0 ? html`
-                                    <span class="ms-1">${lll('tx_ai3.module.folderactions.tasksPending').replace('%cnt', this.folder.countPending)}</span>
-                                `:''}
-                        ${(this.folder.queueFiles || []).filter((file) => file.inProgress).length > 0 ? html`
-                            <div class="d-flex flex-wrap gap-3 mt-2">
-                                ${this.folder.queueFiles.filter((file) => file.inProgress).map((file) => this.renderQueueImage(file, html`
-                                    <span class="badge text-bg-secondary">${lll('tx_ai3.module.folderactions.queueProcessing')}</span>
-                                `))}
-                            </div>
-                        ` : ''}
-                    </fieldset>
                 </div>
+                ${((this.folder.queueFiles || []).filter((file) => file.hasGeneration && !file.inProgress).length > 0 || this.pendingAction?.action === 'accept') ? html`
+                    <div class="row">
+                        <div class="col mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">${lll('tx_ai3.module.folderactions.awaitingApprovalTitle').replace('%cnt', this.folder.countGenerations)}</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex flex-wrap gap-3">
+                                        ${(this.folder.queueFiles || []).filter((file) => file.hasGeneration && !file.inProgress).map((file) => html`
+                                            <queue-image-element
+                                                .file="${file}"
+                                                badge-text="${lll('tx_ai3.module.folderactions.queueAwaitingApproval')}"
+                                                badge-class="text-bg-info"
+                                                show-suggestion></queue-image-element>
+                                        `)}
+                                    </div>
+                                </div>
+                                ${this.pendingAction?.action === 'accept' ? html`
+                                    <div class="card-footer">${this.renderConfirmAlert()}</div>
+                                ` : (this.folder.countGenerations > 0 ? html`
+                                    <div class="card-footer">
+                                        <button class="btn btn-sm btn-default" @click="${this.handleAcceptAll.bind(this)}">
+                                            ${Typo3Icon('actions-approve')}
+                                            ${lll('tx_ai3.module.folderactions.generationsPending').replace('%cnt', this.folder.countGenerations)}
+                                        </button>
+                                    </div>
+                                `: '')}
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+                ${hasQueue ? html`
+                <div class="row">
+                    <div class="col mb-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">${lll('tx_ai3.module.folderactions.queue')}</h3>
+                            </div>
+                            <div class="card-body">
+                                ${this.folder.countPending > 0 ? html`
+                                    <span>${lll('tx_ai3.module.folderactions.tasksPending').replace('%cnt', this.folder.countPending)}</span>
+                                `:''}
+                                ${inProgressFiles.length > 0 ? html`
+                                    <div class="d-flex flex-wrap gap-3 mt-2">
+                                        ${inProgressFiles.map((file) => html`
+                                            <queue-image-element
+                                                .file="${file}"
+                                                badge-text="${ lll('tx_ai3.module.folderactions.' + (file.isPending ? 'queuePending': 'queueProcessing')) }"
+                                                badge-class="text-bg-secondary"></queue-image-element>
+                                        `)}
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="card-footer">
+                                <div class="row">
+                                    <div class="col-auto">
+                                        <button class="btn btn-sm btn-default" ?disabled="${this.waitforResult}" @click="${this.handleProcessQueue.bind(this)}">
+                                            ${Typo3Icon('actions-open')}
+                                            ${lll('tx_ai3.module.folderactions.editQueue') || 'Edit queue now'}
+                                        </button>
+                                    </div>
+                                    <div class="col-auto">
+                                        ${this.waitforResult ? html`
+                                            <div class="mt-2">
+                                                <typo3-backend-spinner size="small"></typo3-backend-spinner>
+                                            </div>
+                                        `:''}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                ${nothingToDo ? html`
+                <div class="row">
+                    <div class="col mb-3">
+                        <div class="card">
+                            <div class="card-body text-muted">
+                                ${lll('tx_ai3.module.folderactions.nothingToDo')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
             </div>
 
         `;

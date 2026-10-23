@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-	<file source-language="en" target-language="de" original="EXT:ai3/Resources/Private/Language/locallang.xlf" datatype="plaintext" product-name="ai3" date="2026-10-20T18:39:33+02:00">
+	<file source-language="en" target-language="de" original="EXT:ai3/Resources/Private/Language/locallang.xlf" datatype="plaintext" product-name="ai3" date="2026-10-23T17:47:06+02:00">
 		<header></header>
 		<body>
 			<trans-unit id="generation.alttext">
@@ -144,8 +144,8 @@
 				<target>in warteschlange</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.awaitingApprovalTitle">
-				<source>Suggestions waiting for approval</source>
-				<target>Vorschläge warten auf Bestätigung</target>
+				<source>%cnt Suggestions waiting for approval</source>
+				<target>%cnt Vorschläge warten auf Bestätigung</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.awaitungApprovalShort">
 				<source>awaiting approval</source>
@@ -160,8 +160,8 @@
 				<target>OK</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.confirm.acceptAll">
-				<source>Are you sure you want to accept and apply %cnt AI alt-text suggestion(s)?</source>
-				<target>Möchten Sie wirklich %cnt KI-Alternativtext-Vorschlag/-Vorschläge übernehmen?</target>
+				<source>Apply %cnt AI alt-text suggestion(s)?</source>
+				<target>%cnt KI-Vorschläge übernehmen?</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.confirm.generatingAll">
 				<source>Are you sure you want to create AI alt-text tasks for %cnt image(s)?</source>
@@ -192,8 +192,8 @@
 				<target>davon ohne Alt-Text</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.generationsPending">
-				<source>%cnt suggestions waiting for approval</source>
-				<target>%cnt Vorschläge warten auf Bestätigung</target>
+				<source>Approve %cnt suggestions</source>
+				<target>%cnt Vorschläge bestätigen</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.header">
 				<source>Folder Actions</source>
@@ -210,6 +210,10 @@
 			<trans-unit id="tx_ai3.module.folderactions.nosubfolders">
 				<source>No Sub Folders</source>
 				<target>Keine Unterordner vorhanden</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.nothingToDo">
+				<source>Nothing to do here. All images in this folder (and all subfolders) have an alternative Text set.</source>
+				<target>Hier gibt es nichts zu tun. Alle Bilder in diesem Ordner (und allen Unterordnern) haben einen Alternativtext erhalten.</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.notif.acceptingAll">
 				<source>Accepting and applying %cnt AI alt-text suggestion(s)...</source>
@@ -231,9 +235,21 @@
 				<source>No AI suggestions available to accept.</source>
 				<target>Keine KI-Vorschläge zum Übernehmen vorhanden.</target>
 			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.notif.queueProcessed">
+				<source>%cnt queued task(s) processed.</source>
+				<target>%cnt Aufgabe(n) aus der Warteschlange abgearbeitet.</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.notif.queueProcessError">
+				<source>Unable to process the queue.</source>
+				<target>Die Warteschlange konnte nicht abgearbeitet werden.</target>
+			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.queue">
 				<source>Queue:</source>
 				<target>Warteschlange:</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.editQueue">
+				<source>Run queue now</source>
+				<target>Verarbeitung jetzt starten</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.queueAwaitingApproval">
 				<source>awaiting approval</source>
@@ -242,6 +258,10 @@
 			<trans-unit id="tx_ai3.module.folderactions.queueProcessing">
 				<source>processing</source>
 				<target>wird bearbeitet</target>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.queuePending">
+				<source>pending</source>
+				<target>wartet auf Einplanung</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.subfolders">
 				<source>Sub Folders</source>
@@ -260,8 +280,8 @@
 				<target>Alternativer Text</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3_alttext.module.actionmenu.files">
-				<source>File Metadata</source>
-				<target>Datei Metadaten</target>
+				<source>Single Folder</source>
+				<target>Einzelner Ordner</target>
 			</trans-unit>
 			<trans-unit id="tx_ai3_alttext.module.actionmenu.folders">
 				<source>Folders</source>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-	<file source-language="en" original="EXT:ai3/Resources/Private/Language/locallang.xlf" datatype="plaintext" product-name="ai3" date="2026-10-20T18:39:33+02:00">
+	<file source-language="en" original="EXT:ai3/Resources/Private/Language/locallang.xlf" datatype="plaintext" product-name="ai3" date="2026-10-23T17:17:04+02:00">
 		<header></header>
 		<body>
 			<trans-unit id="generation.alttext">
@@ -109,7 +109,7 @@
 				<source>queued</source>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.awaitingApprovalTitle">
-				<source>Suggestions waiting for approval</source>
+				<source>%cnt Suggestions waiting for approval</source>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.awaitungApprovalShort">
 				<source>awaiting approval</source>
@@ -121,7 +121,7 @@
 				<source>OK</source>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.confirm.acceptAll">
-				<source>Are you sure you want to accept and apply %cnt AI alt-text suggestion(s)?</source>
+				<source>Apply %cnt AI alt-text suggestion(s)?</source>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.confirm.generatingAll">
 				<source>Are you sure you want to create AI alt-text tasks for %cnt image(s)?</source>
@@ -145,7 +145,7 @@
 				<source>without Alt text</source>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.generationsPending">
-				<source>%cnt suggestions waiting for approval</source>
+				<source>Approve %cnt suggestions</source>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.header">
 				<source>Folder Actions</source>
@@ -158,6 +158,9 @@
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.nosubfolders">
 				<source>No Sub Folders</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.nothingToDo">
+				<source>Nothing to do here. All images in this folder (and all subfolders) have an alternative Text set.</source>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.notif.acceptingAll">
 				<source>Accepting and applying %cnt AI alt-text suggestion(s)...</source>
@@ -174,14 +177,26 @@
 			<trans-unit id="tx_ai3.module.folderactions.notif.noSuggestions">
 				<source>No AI suggestions available to accept.</source>
 			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.notif.queueProcessed">
+				<source>%cnt queued task(s) processed.</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.notif.queueProcessError">
+				<source>Unable to process the queue.</source>
+			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.queue">
 				<source>Queue:</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.editQueue">
+				<source>Run queue now</source>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.queueAwaitingApproval">
 				<source>awaiting approval</source>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.queueProcessing">
 				<source>processing</source>
+			</trans-unit>
+			<trans-unit id="tx_ai3.module.folderactions.queuePending">
+				<source>pending</source>
 			</trans-unit>
 			<trans-unit id="tx_ai3.module.folderactions.subfolders">
 				<source>Sub Folders</source>
@@ -196,7 +211,7 @@
 				<source>Alternative text</source>
 			</trans-unit>
 			<trans-unit id="tx_ai3_alttext.module.actionmenu.files">
-				<source>File Metadata</source>
+				<source>Single Folder</source>
 			</trans-unit>
 			<trans-unit id="tx_ai3_alttext.module.actionmenu.folders">
 				<source>Folders</source>

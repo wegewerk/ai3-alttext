@@ -6,7 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
-
+### added
+- Improved alt-text generation for subfolders.
 
 ## [0.9.29] - 2026-10-21
 ### added

@@ -75,6 +75,11 @@ class Ai3Api extends Ai3ApiBase {
                 .post(payload);
     }
 
+    processQueue() {
+        return new AjaxRequest(TYPO3.settings.ajaxUrls['ai3_core_process_tasks'])
+            .post({});
+    }
+
     loadFolder(folderIdentifier) {
         return new AjaxRequest(TYPO3.settings.ajaxUrls['ai3_filelist'])
             .withQueryArguments({'folder': folderIdentifier})

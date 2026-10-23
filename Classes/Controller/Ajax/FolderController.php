@@ -142,7 +142,7 @@ class FolderController extends AbstractAjaxController
 
     private function shouldCreateTask(array $file, string $filter): bool
     {
-        if (($file['inProgress'] ?? false) === true) {
+        if ( ($file['inProgress'] ?? false) || ($file['isPending'] ?? false) === true) {
             return false;
         }
         if ($filter === 'withoutAlttext') {
@@ -249,8 +249,10 @@ class FolderController extends AbstractAjaxController
                             'metadataUid' => $metadataUid,
                             'alternative' => (string)($meta['alternative'] ?? ''),
                             'inProgress' => $this->generationTaskService->isTaskRunning($metadataUid),
+                            'isPending' => $this->generationTaskService->isTaskPending($metadataUid),
                             'numrefs' => $includeRefs ? $this->alttextTaskService->getRefs($file->getUid()) : 0,
                             'thumbnailUrl' => $includeThumbnails ? $this->getThumbnailUrl($file) : null,
+                            'publicUrl' => $file->getPublicUrl(),
                         ];
                     }
                 }
@@ -309,11 +311,21 @@ class FolderController extends AbstractAjaxController
                     $metadata['countPending']++;
                 }
                 if ($withQueueFiles && (($file['inProgress'] ?? false) === true || ($file['hasGeneration'] ?? false) === true)) {
+                    $altSuggestion = '';
+                    if (($file['hasGeneration'] ?? false) === true) {
+                        $task = $this->generationTaskService->getTask((int)($file['metadataUid'] ?? 0));
+                        if ($task !== null && $task->hasResult()) {
+                            $altSuggestion = $task->getResult();
+                        }
+                    }
                     $metadata['queueFiles'][] = [
                         'uid' => $file['uid'],
                         'name' => $file['name'],
                         'thumbnailUrl' => $file['thumbnailUrl'],
+                        'publicUrl' => $file['publicUrl'] ?? null,
+                        'altSuggestion' => $altSuggestion,
                         'inProgress' => (bool)($file['inProgress'] ?? false),
+                        'isPending' => (bool)($file['isPending'] ?? false),
                         'hasGeneration' => (bool)($file['hasGeneration'] ?? false),
                     ];
                 }

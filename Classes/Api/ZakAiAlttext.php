@@ -28,7 +28,7 @@ class ZakAiAlttext extends AbstractZakAiEndpoint
     }
 
     protected function preparePayload(array $payload, array $options): array {
-        $imagePath = (string)($options['imagePath'] ?? '');
+        $imagePath = (string)($options['image'] ?? '');
         if (!file_exists($imagePath)) {
             throw new \InvalidArgumentException('Bilddatei nicht gefunden: ' . $imagePath);
         }
