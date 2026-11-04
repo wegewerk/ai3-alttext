@@ -9,40 +9,7 @@ Configuration
 ai3-alttext has no extension-specific settings in the TYPO3
 Extension Manager. All configuration is done via environment variables
 that are read by :composer:`wegewerk/ai3_core`.
-
-.. _configuration-env:
-
-Environment variables
-=====================
-
-The following environment variables must be set on the server before
-the extension can communicate with the ZAK-AI API:
-
-.. confval:: ZAKAI_API_KEY
-    :name: ZAKAI_API_KEY
-    :type: string
-    :default: (empty)
-
-    The API key issued by ZAK-AI for your account. When this variable
-    is empty, all API calls will throw a ``RuntimeException``.
-
-.. confval:: ZAKAI_SECRET
-    :name: ZAKAI_SECRET
-    :type: string
-    :default: (empty)
-
-    The shared secret used together with ``ZAKAI_API_KEY`` to build
-    the HTTP Basic Authorization header
-    (``base64(secret + ':' + apiKey)``).
-
-Set these variables in your server environment, :file:`.env` file, or
-TYPO3 :file:`config/system/additional.php`:
-
-.. code-block:: php
-    :caption: config/system/additional.php
-
-    putenv('ZAKAI_API_KEY=your-api-key');
-    putenv('ZAKAI_SECRET=your-secret');
+See https://docs.typo3.org/p/wegewerk/ai3_core/main/en-us/Installation/Index.html
 
 .. _configuration-tca:
 
