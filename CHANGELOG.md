@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
+
+
+## [0.9.31] - 2026-11-04
 ## fix
 - link ai3_core documentation in configuration section
 
