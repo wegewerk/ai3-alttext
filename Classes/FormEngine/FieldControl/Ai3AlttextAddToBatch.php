@@ -61,20 +61,42 @@ class Ai3AlttextAddToBatch extends AbstractNode
      */
     private function buildLinkAttributes(): array
     {
-        $inProgress = $this->generationTaskService->isTaskRunning($this->data['databaseRow']['uid']);
-        $isGenerated = $this->generationTaskService->isGenerated($this->data['databaseRow']['uid'], $this->data['databaseRow']['alternative']);
-        $isReviewed = $this->generationTaskService->isReviewed($this->data['databaseRow']['uid']);
+        $uid = (int)($this->data['databaseRow']['uid'] ?? 0);
+        $alternative = (string)($this->data['databaseRow']['alternative'] ?? '');
+        $tstamp = (int)($this->data['databaseRow']['tstamp'] ?? 0);
+
+        $inProgress = $this->generationTaskService->isTaskRunning($uid);
+        $isGenerated = $this->generationTaskService->isGenerated($uid, $alternative);
+        $isReviewed = $this->generationTaskService->isReviewed($uid);
+        $hasGeneration = $this->hasGeneration($uid, $alternative, $tstamp);
 
         return [
             'id' => 'alttext_add_to_batch',
             'class' => 'ai3-alttext-add-to-batch-btn',
-            'data-id' => $this->data['databaseRow']['uid'] ?? '',
+            'data-id' => $uid ?: '',
             'data-table' => $this->data['tableName'] ?? '',
             'data-field-name' => self::FIELD_NAME,
             'data-field-label' => 'Alttext batch generation',
             'data-in-progress' => $inProgress,
             'data-is-generated' => $isGenerated,
             'data-is-reviewed' => $isReviewed,
+            'data-has-generation' => $hasGeneration,
+            'data-alt-suggestion' => $hasGeneration ? $this->generationTaskService->getLatestResult($uid) : '',
         ];
+    }
+
+    /**
+     * Prüft, ob ein noch nicht übernommener Generierungsvorschlag vorliegt.
+     *
+     * Entspricht der Logik aus fileElement.js: ein abgeschlossener Task existiert
+     * und ist neuer als der aktuelle Datensatz (bzw. das Feld ist noch leer).
+     */
+    private function hasGeneration(int $uid, string $alternative, int $tstamp): bool
+    {
+        if ($uid === 0 || !$this->generationTaskService->hasGenerationDone($uid)) {
+            return false;
+        }
+
+        return $alternative === '' || $this->generationTaskService->lastGenerationNewerThan($uid, $tstamp);
     }
 }

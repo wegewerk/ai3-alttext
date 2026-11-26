@@ -59,6 +59,28 @@ class FilemetadataRepository
             ->fetchAssociative();
     }
 
+    public function getMetadataByUid(int $metadataUid): array
+    {
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable($this->table);
+        $queryBuilder->getRestrictions()
+            ->removeAll()
+            ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+
+        $metadata = $queryBuilder
+            ->select('*')
+            ->from($this->table)
+            ->where(
+                $queryBuilder->expr()->eq(
+                    'uid',
+                    $queryBuilder->createNamedParameter($metadataUid, Connection::PARAM_INT)
+                )
+            )
+            ->executeQuery()
+            ->fetchAssociative();
+
+        return $metadata ?: [];
+    }
+
     public function getFilemetadataUidForLanguage(int $fileUid, int $langUid = 0): int
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)

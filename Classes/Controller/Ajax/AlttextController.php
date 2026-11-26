@@ -18,6 +18,7 @@ use Wegewerk\Ai3Alttext\Domain\Capabilities\AlttextCapability;
 use Wegewerk\Ai3Alttext\Domain\Repository\FilemetadataRepository;
 use Wegewerk\Ai3Core\Controller\Ajax\AbstractAjaxController;
 use Wegewerk\Ai3Core\Domain\Model\Dto\AddGenerationTask;
+use Wegewerk\Ai3Core\Domain\Model\GenerationTask;
 use Wegewerk\Ai3Core\Enums\Status;
 use Wegewerk\Ai3Core\Service\GenerationTaskService;
 
@@ -45,17 +46,16 @@ class AlttextController extends AbstractAjaxController
     {
         try {
             $parsedBody = $request->getParsedBody();
-            $langUid = (int)($parsedBody['langUid'] ?? 0);
             $langIsoCode = $parsedBody['language'] ?? 'de';
 
             $this->validateRequestParameters(['record_uid'], $parsedBody);
             $this->validateConcurrentTaskAdding((int)$parsedBody['record_uid']);
 
-            $metadataUid = $this->filemetadataRepository->getFilemetadataUidForLanguage((int)$parsedBody['record_uid'], $langUid);
-            $metadata = $this->filemetadataRepository->getMetadata((int)$parsedBody['record_uid'] ?? 0, $langUid);
+            // Der FieldControl übergibt die UID des sys_file_metadata-Datensatzes.
+            $metadataUid = (int)$parsedBody['record_uid'];
+            $metadata = $this->filemetadataRepository->getMetadataByUid($metadataUid);
 
             $prompt = $metadata['title'] ?? '' . $metadata['description'] ?? '';
-            $service = 'zakaiservice';
 
             $imagePath = $this->getImagePath((int)$parsedBody['record_uid']);
             $dto = new AddGenerationTask(
@@ -63,8 +63,6 @@ class AlttextController extends AbstractAjaxController
                 $prompt,
                 $imagePath,
                 $this->alttextCapability->key,
-                $service,
-                '',
                 'sys_file_metadata',
                 'alternative',
                 $metadataUid,
@@ -169,9 +167,15 @@ class AlttextController extends AbstractAjaxController
 
             $this->validateRequestParameters(['record_uid'], $parsedBody);
 
+            $alttext = $parsedBody['alttext'] ?? null;
             $task = $this->generationTaskService->getTask((int)$parsedBody['record_uid']);
-            if (($task !== null) && !$task->isReviewed()) {
-                $this->generationTaskService->setReviewed($task);
+            if ($task !== null) {
+                if (is_string($alttext)) {
+                    $this->persistAlttext($task, $alttext);
+                }
+                if (!$task->isReviewed()) {
+                    $this->generationTaskService->setReviewed($task);
+                }
             }
 
             return $this->createJsonSuccessResponse(
@@ -188,6 +192,40 @@ class AlttextController extends AbstractAjaxController
                 ['message' => $message ]
             );
         }
+    }
+
+    /**
+     * Persistiert den (ggf. bearbeiteten) Alttext im Datensatz des Generation-Tasks.
+     */
+    private function persistAlttext(GenerationTask $task, string $alttext): void
+    {
+        $recordTable = $task->getRecordTable();
+        $recordField = $task->getRecordField();
+        $recordUid = $task->getRecordUid();
+
+        if ($recordTable === '' || $recordField === '' || $recordUid === 0) {
+            return;
+        }
+
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable($recordTable);
+
+        $queryBuilder
+            ->update($recordTable)
+            ->where(
+                $queryBuilder->expr()->eq(
+                    'uid',
+                    $queryBuilder->createNamedParameter($recordUid, Connection::PARAM_INT)
+                )
+            )
+            ->set($recordField, $alttext);
+
+        $timestampField = $GLOBALS['TCA'][$recordTable]['ctrl']['tstamp'] ?? null;
+        if (is_string($timestampField) && $timestampField !== '') {
+            $queryBuilder->set($timestampField, time());
+        }
+
+        $queryBuilder->executeStatement();
     }
 
     public function selectAlttextAction(ServerRequestInterface $request): ResponseInterface

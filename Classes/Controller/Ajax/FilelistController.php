@@ -157,7 +157,7 @@ public function addAlttextTaskForFile(ServerRequestInterface $request): Response
         $files = $folder->getFiles();
         foreach ($files as $file) {
             if ($file instanceof FileInterface) {
-                $isImage = ($file instanceof File && $file->getType() === FILETYPE::IMAGE) || str_starts_with((string)$file->getMimeType(), 'image/');
+                $isImage = ($file instanceof File && $file->getType() === FileType::IMAGE->value) || str_starts_with((string)$file->getMimeType(), 'image/');
 
                 if ($isImage) {
                     try {

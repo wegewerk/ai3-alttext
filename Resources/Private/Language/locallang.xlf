@@ -105,6 +105,9 @@
 			<trans-unit id="tx_ai3.module.filemetadata.selection">
 				<source>Selection</source>
 			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.status.generating">
+				<source>Generating alt text</source>
+			</trans-unit>
 			<trans-unit id="tx_ai3.module.filemetadata.status.queued">
 				<source>queued</source>
 			</trans-unit>

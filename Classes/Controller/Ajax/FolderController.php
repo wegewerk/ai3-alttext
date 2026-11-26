@@ -230,7 +230,7 @@ class FolderController extends AbstractAjaxController
         $files = $folder->getFiles(0, 0, $folder::FILTER_MODE_USE_OWN_AND_STORAGE_FILTERS, true);
         foreach ($files as $file) {
             if ($file instanceof FileInterface) {
-                $isImage = ($file instanceof File && $file->getType() === FILETYPE::IMAGE) || str_starts_with((string)$file->getMimeType(), 'image/');
+                $isImage = ($file instanceof File && $file->getType() === FileType::IMAGE->value) || str_starts_with((string)$file->getMimeType(), 'image/');
 
                 if ($isImage) {
                     /** @var MetaDataAspect $meta */

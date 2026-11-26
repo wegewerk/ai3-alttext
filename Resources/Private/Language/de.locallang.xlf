@@ -139,6 +139,10 @@
 				<source>Selection</source>
 				<target>Auswahl</target>
 			</trans-unit>
+			<trans-unit id="tx_ai3.module.filemetadata.status.generating">
+				<source>Generating alt text</source>
+				<target>Alt-Text wird generiert</target>
+			</trans-unit>
 			<trans-unit id="tx_ai3.module.filemetadata.status.queued">
 				<source>queued</source>
 				<target>in warteschlange</target>

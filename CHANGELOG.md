@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/)
 
 ## [Unreleased]
-
+### fixed
+- Alt text editing in the file metadata form
+- Dark mode readability of the alt text field
 
 ## [0.9.31] - 2026-11-04
 ## fix

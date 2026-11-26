@@ -1,5 +1,8 @@
 import Ajax from "@wegewerk/ai3core/ajax.js";
 import ResponseHandling from "@wegewerk/ai3core/response-handling.js";
+import Typo3Icon from "@wegewerk/ai3core/Typo3Icon.js";
+import {lll} from "@typo3/core/lit-helper.js";
+import {html, nothing, render} from 'lit-html';
 
 class AddToBatch {
   constructor() {
@@ -10,8 +13,8 @@ class AddToBatch {
     this.textarea = document.querySelector('[name="data[sys_file_metadata][' + this.id + '][alternative]"]');
 
     this.wrapper =
-    this.textarea.closest('.form-wizards-item-element') || // TYPO3 v13 compatibility
-    this.textarea.closest('.form-wizards-element');        // TYPO3 v12 compatibility
+      this.textarea.closest('.form-wizards-item-element') || // TYPO3 v13 compatibility
+      this.textarea.closest('.form-wizards-element');        // TYPO3 v12 compatibility
 
     if (this.wrapper) {
       this.wrapper.classList.add('position-relative');
@@ -19,82 +22,92 @@ class AddToBatch {
 
     this.textarea.style.height = (this.textarea.offsetHeight + 50) + 'px';
 
-    this.inProgress = this.button.getAttribute('data-in-progress');
-    this.isGenerated = this.button.getAttribute('data-is-generated');
-    this.isReviewed = this.button.getAttribute('data-is-reviewed');
+    this.inProgress = this.button.getAttribute('data-in-progress') === '1';
+    this.isGenerated = this.button.getAttribute('data-is-generated') === '1';
+    this.isReviewed = this.button.getAttribute('data-is-reviewed') === '1';
+    this.hasGeneration = this.button.getAttribute('data-has-generation') === '1';
+    this.altSuggestion = this.button.getAttribute('data-alt-suggestion') || '';
+
+    this.isEditingSuggestion = false;
+    this.editedSuggestion = this.altSuggestion;
+
+    this.suggestionContainer = document.createElement('div');
+    this.suggestionContainer.id = 'alttext_suggestion';
+    this.textarea.insertAdjacentElement('afterend', this.suggestionContainer);
 
     this.initializeAddToBatchButton();
-    this.initializeAiMarker();
+    this.updateFieldStyles();
+    this.renderSuggestion();
+
+    if (this.inProgress) {
+      this.checkAlttextGenerationStatus();
+    }
   }
 
   initializeAddToBatchButton() {
-    let self = this;
-
-    if (self.inProgress) {
-      self.button.querySelector('svg.icon-color').style.display = 'none';
-      self.button.querySelector('span.icon-markup').classList.add('spinner-border', 'spinner-border-sm');
+    if (this.inProgress) {
+      this.showSpinner();
     }
 
-    self.button.addEventListener("click", function (ev) {
+    this.button.addEventListener("click", (ev) => {
       ev.preventDefault();
 
-      if (self.inProgress) {
+      if (this.inProgress) {
         console.log('AI-Generierung ist bereits in Arbeit.');
-      } else {
-        let id = self.id;
-        let table = this.getAttribute('data-table');
-        let fieldName = this.getAttribute('data-field-name');
-        let fieldLabel = this.getAttribute('data-field-label');
-        let postData = {
-          record_uid: id,
-          record_table: table,
-          record_field: fieldName,
-          fieldLabel: fieldLabel,
-        };
-
-        self.button.querySelector('svg.icon-color').style.display = 'none';
-        self.button.querySelector('span.icon-markup').classList.add('spinner-border', 'spinner-border-sm');
-
-        self.textarea.classList.remove('border-success', 'bg-success-subtle', 'border-warning', 'bg-warning-subtle');
-        self.textarea.classList.add('border', 'border-info', 'bg-info-subtle');
-
-        const reviewButton = document.querySelector('#alttext_review');
-        if (reviewButton) {
-          reviewButton.remove();
-        }
-
-        self.generatedBadgeHandler('info');
-
-        self.generateAlttext(postData)
-          .then((res) => {
-            self.inProgress = true;
-            self.checkAlttextGenerationStatus();
-
-            ResponseHandling.handleSuccess(res, TYPO3.lang['tx_ai3.module.modal.alttextError']);
-          })
-          .catch(error => {
-            clearInterval(self.intervalId);
-            ResponseHandling.handleError(error, TYPO3.lang['tx_ai3.module.modal.alttextError']);
-          });
+        return;
       }
+
+      const postData = {
+        record_uid: this.id,
+        record_table: this.button.getAttribute('data-table'),
+        record_field: this.button.getAttribute('data-field-name'),
+        fieldLabel: this.button.getAttribute('data-field-label'),
+      };
+
+      this.inProgress = true;
+      this.showSpinner();
+      this.updateFieldStyles();
+      this.renderSuggestion();
+
+      this.generateAlttext(postData)
+        .then((res) => {
+          this.checkAlttextGenerationStatus();
+
+          ResponseHandling.handleSuccess(res, TYPO3.lang['tx_ai3.module.modal.alttextError']);
+        })
+        .catch(error => {
+          clearInterval(this.intervalId);
+          this.inProgress = false;
+          this.hideSpinner();
+          this.updateFieldStyles();
+          this.renderSuggestion();
+
+          ResponseHandling.handleError(error, TYPO3.lang['tx_ai3.module.modal.alttextError']);
+        });
     });
   }
 
-  initializeAiMarker() {
-    let self = this;
+  showSpinner() {
+    const icon = this.button.querySelector('svg.icon-color');
+    const markup = this.button.querySelector('span.icon-markup');
 
-    if (self.inProgress) {
-      self.textarea.classList.add('border', 'border-info');
-      self.generatedBadgeHandler('info');
-    } else if (self.isGenerated) {
-      if (self.isReviewed) {
-        self.textarea.classList.add('border', 'border-success');
-        self.generatedBadgeHandler('success');
-      } else {
-        self.textarea.classList.add('border', 'border-warning');
-        self.generatedBadgeHandler('warning');
-        self.reviewButtonInitialization();
-      }
+    if (icon) {
+      icon.style.display = 'none';
+    }
+    if (markup) {
+      markup.classList.add('spinner-border', 'spinner-border-sm');
+    }
+  }
+
+  hideSpinner() {
+    const icon = this.button.querySelector('svg.icon-color');
+    const markup = this.button.querySelector('span.icon-markup');
+
+    if (icon) {
+      icon.style.display = '';
+    }
+    if (markup) {
+      markup.classList.remove('spinner-border', 'spinner-border-sm');
     }
   }
 
@@ -112,109 +125,213 @@ class AddToBatch {
     });
   }
 
-  checkAlttextGenerationStatus(data) {
-    let self = this;
-
+  checkAlttextGenerationStatus() {
     const poll = async () => {
-      const status = await Ajax.sendAjaxRequest('ai3_alttext_generation_status', {record_uid: self.id});
+      const status = await Ajax.sendAjaxRequest('ai3_alttext_generation_status', {record_uid: this.id});
       if (!status) {
         return;
       }
+
+      if (!status.running && !status.done) {
+        clearInterval(this.intervalId);
+        this.inProgress = false;
+        this.hideSpinner();
+        this.updateFieldStyles();
+        this.renderSuggestion();
+        return;
+      }
+
       if (status.done) {
-        clearInterval(self.intervalId);
+        clearInterval(this.intervalId);
 
-        self.inProgress = false;
-        if (typeof status.result === 'string') {
-          self.textarea.value = status.result;
-        }
+        this.inProgress = false;
+        this.hideSpinner();
 
-        // Update AddToBatch button
-        self.button.querySelector('span.icon-markup').classList.remove('spinner-border', 'spinner-border-sm');
-        self.button.querySelector('svg.icon-color').style.display = '';
+        this.altSuggestion = typeof status.result === 'string' ? status.result : '';
+        this.hasGeneration = this.altSuggestion !== '';
+        this.isGenerated = this.altSuggestion !== '' && this.textarea.value === this.altSuggestion;
+        this.isReviewed = Boolean(status.reviewed);
+        this.isEditingSuggestion = false;
+        this.editedSuggestion = this.altSuggestion;
 
-        // Update AI marker
-        self.textarea.classList.remove('border-info', 'bg-info-subtle');
-        if (status.reviewed) {
-          self.textarea.classList.add('border-success', 'bg-success-subtle');
-        } else {
-          self.textarea.classList.add('border-warning', 'bg-warning-subtle');
-        }
-
-        // Update AI badge
-        if (status.reviewed) {
-          self.generatedBadgeHandler('success');
-        } else {
-          self.generatedBadgeHandler('warning');
-        }
-
-        // Handle review button
-        if (!status.reviewed) {
-          self.reviewButtonInitialization();
-        }
+        this.updateFieldStyles();
+        this.renderSuggestion();
       }
     };
-    self.intervalId = setInterval(poll, 5000);
+
+    this.intervalId = setInterval(poll, 5000);
     poll();
   }
 
-  reviewButtonInitialization() {
-    let self = this;
-
-    if (!document.querySelector('#alttext_review')) {
-      self.textarea.insertAdjacentHTML('afterend', '<span style="position: absolute; bottom: 5px; left: 5px;"><button id="alttext_review" class="btn btn-success rounded-pill btn-sm px-1 py-1 pe-2" type="button"><typo3-backend-icon identifier="actions-check" size="small"></typo3-backend-icon> Als geprüft markieren</button></span>');
+  /**
+   * Übernimmt den Vorschlag in das Alttext-Feld und markiert den Task als geprüft.
+   */
+  handleApproveSuggestion() {
+    if (this.isEditingSuggestion) {
+      this.altSuggestion = this.editedSuggestion;
     }
 
-    const reviewButton = document.querySelector('#alttext_review');
-    self.reviewButtonEventListener(reviewButton);
+    this.applyAltSuggestion();
+    this.approveAlttext();
   }
 
-    reviewButtonEventListener(reviewButton) {
-    let self = this;
+  /**
+   * Markiert den bereits im Feld stehenden Alttext als geprüft.
+   */
+  handleReview() {
+    this.approveAlttext();
+  }
 
-    reviewButton.addEventListener('click', function () {
-      this.querySelector('typo3-backend-icon').identifier = 'spinner-circle';
-
-      let postData = {
-        record_uid: self.id
-      };
-
-      self.reviewAlttext(postData)
-        .then((res) => {
-          self.textarea.classList.remove('border-warning', 'bg-warning-subtle');
-          self.textarea.classList.add('border-success', 'bg-success-subtle');
-
-          self.generatedBadgeHandler('success');
-
-          this.style.display = 'none';
-
-          clearInterval(self.intervalId);
-          ResponseHandling.handleSuccess(res, TYPO3.lang['tx_ai3.module.modal.alttextError']);
-        })
-        .catch(error => {
-          clearInterval(self.intervalId);
-          ResponseHandling.handleError(error, TYPO3.lang['tx_ai3.module.modal.alttextError']);
-        });
+  approveAlttext() {
+    this.reviewAlttext({
+      record_uid: this.id,
+      alttext: this.textarea.value,
     })
+      .then((res) => {
+        clearInterval(this.intervalId);
+
+        this.inProgress = false;
+        this.isGenerated = true;
+        this.isReviewed = true;
+        this.hasGeneration = false;
+        this.isEditingSuggestion = false;
+
+        this.updateFieldStyles();
+        this.renderSuggestion();
+
+        ResponseHandling.handleSuccess(res, TYPO3.lang['tx_ai3.module.modal.alttextError']);
+      })
+      .catch(error => {
+        ResponseHandling.handleError(error, TYPO3.lang['tx_ai3.module.modal.alttextError']);
+      });
   }
 
-  generatedBadgeHandler(style) {
-    let self = this;
+  handleEditSuggestion() {
+    this.isEditingSuggestion = true;
+    this.editedSuggestion = this.altSuggestion;
+    this.renderSuggestion();
+  }
 
-    const generatedBadge = document.querySelector('#alttext_generated_badge');
-    if (!generatedBadge) {
-      self.textarea.insertAdjacentHTML('afterend', '<span id="alttext_generated_badge" class="ki-label badge badge-' + style + ' text-bg-' + style + '" style="position: absolute; bottom: 5px; right: 5px;">KI generiert</span>');
+  handleCancelSuggestionEdit() {
+    this.isEditingSuggestion = false;
+    this.editedSuggestion = this.altSuggestion;
+    this.renderSuggestion();
+  }
+
+  applyAltSuggestion() {
+    if (this.textarea.value === this.altSuggestion) {
+      return;
     }
 
-    if (generatedBadge && style) {
-      generatedBadge.classList.remove('badge-success', 'text-bg-success', 'badge-warning', 'text-bg-warning', 'badge-info', 'text-bg-info');
-      generatedBadge.classList.add('badge-' + style, 'text-bg-' + style);
+    this.textarea.value = this.altSuggestion;
+    this.textarea.dispatchEvent(new Event('input', {bubbles: true}));
+  }
 
-      if (style === 'info') {
-        generatedBadge.innerHTML = 'Generierung in Arbeit';
-      } else {
-        generatedBadge.innerHTML = 'KI generiert';
-      }
+  updateFieldStyles() {
+    this.textarea.classList.remove(
+      'border-success', 'bg-success-subtle',
+      'border-warning', 'bg-warning-subtle',
+      'border-info', 'bg-info-subtle',
+      'border'
+    );
+
+    // Only use border colors: the Bootstrap "*-subtle" backgrounds are not
+    // dark-mode aware in the TYPO3 backend and make the text unreadable.
+    if (this.inProgress) {
+      this.textarea.classList.add('border', 'border-info');
+    } else if (this.isGenerated && this.isReviewed) {
+      this.textarea.classList.add('border', 'border-success');
+    } else if (this.isGenerated) {
+      this.textarea.classList.add('border', 'border-warning');
     }
+  }
+
+  renderSuggestion() {
+    render(this.buildSuggestionTemplate(), this.suggestionContainer);
+  }
+
+  buildSuggestionTemplate() {
+    if (this.inProgress) {
+      return html`
+        <span class="ki-label badge badge-info text-bg-info">
+          ${lll('tx_ai3.module.filemetadata.status.generating')}
+        </span>
+      `;
+    }
+
+    if (this.isGenerated) {
+      return html`
+        <div class="mt-2">
+          <span class="ki-label badge badge-info text-bg-info">${lll('tx_ai3.module.filemetadata.aigenerated')}</span>
+          ${this.isReviewed
+            ? html`<span class="ki-label badge badge-success text-bg-success ms-1">${lll('tx_ai3.module.filemetadata.approved')}</span>`
+            : html`
+                <button id="alttext_review"
+                        class="btn btn-success rounded-pill btn-sm px-1 py-1 pe-2 ms-1"
+                        type="button"
+                        @click=${() => this.handleReview()}>
+                  ${Typo3Icon('actions-check')}
+                  ${lll('tx_ai3.module.filemetadata.action.approve')}
+                </button>
+              `}
+        </div>
+      `;
+    }
+
+    if (this.hasGeneration) {
+      return html`
+        <div class="border border-info border-1 rounded p-2 mt-2">
+          <div class="row">
+            <div class="col">
+              <span class="ki-label badge badge-info text-bg-info">${lll('tx_ai3.module.filemetadata.badge.aisuggestion')}</span>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              ${this.isEditingSuggestion
+                ? html`
+                    <textarea class="form-control mt-2"
+                              rows="3"
+                              .value=${this.editedSuggestion}
+                              @input=${(e) => { this.editedSuggestion = e.target.value; }}></textarea>
+                  `
+                : html`<p class="mb-0 mt-2">${this.altSuggestion}</p>`}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col mt-2">
+              ${this.isEditingSuggestion
+                ? html`
+                    <button class="btn btn-sm btn-primary"
+                            type="button"
+                            @click=${() => this.handleApproveSuggestion()}>
+                      ${lll('tx_ai3.module.filemetadata.action.approve')}
+                    </button>
+                    <button class="btn btn-sm btn-secondary"
+                            type="button"
+                            @click=${() => this.handleCancelSuggestionEdit()}>
+                      ${lll('tx_ai3.module.folderactions.cancel')}
+                    </button>
+                  `
+                : html`
+                    <button class="btn btn-sm btn-primary"
+                            type="button"
+                            @click=${() => this.handleApproveSuggestion()}>
+                      ${lll('tx_ai3.module.filemetadata.action.approve')}
+                    </button>
+                    <button class="btn btn-sm btn-secondary"
+                            type="button"
+                            @click=${() => this.handleEditSuggestion()}>
+                      ${lll('tx_ai3.module.filemetadata.action.editSuggestion')}
+                    </button>
+                  `}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    return nothing;
   }
 }
 
